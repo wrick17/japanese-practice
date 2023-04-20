@@ -65,6 +65,10 @@ input[type="checkbox"] {
 }
 
 .block.hiding {
+  font-size: 14px;
+}
+
+.block.hiding span {
   font-size: 48px;
 }
 

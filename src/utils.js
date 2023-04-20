@@ -11,9 +11,11 @@ export const divideList = (list) => {
   return dividedList;
 };
 
-export const getVowels = (list) => list.slice(0, 5);
+export const getVowels = (list) =>
+  list.filter((item) => item.roumaji.length === 1);
 
-export const getConestants = (list) => list.slice(5);
+export const getConestants = (list) =>
+  list.filter((item) => item.roumaji.length > 1);
 
 export const getWhitelisted = (list, whitelist) =>
   list.filter((item) => whitelist.includes(item.roumaji[0]));
@@ -49,19 +51,13 @@ export const getList = (whitelist) => {
 const gojuuon = divideList(hiragana).gojuuon;
 
 export const masterList = getMasterList(getConestants(gojuuon));
-masterList.push("ϕ");
-
-export const selectRandom = (list) => {
-  const randomIndex = Math.floor(Math.random() * list.length);
-  return list[randomIndex];
-};
 
 const insertCharacter = (cheatSheetMap, gojuuon, item, index) => {
   if (index === 16) {
     cheatSheetMap["t"].push(gojuuon[16]);
   }
-  if (index === 45) {
-    return (cheatSheetMap["ϕ"] = [gojuuon[45]]);
+  if (item.roumaji === "n") {
+    return;
   }
   cheatSheetMap[item.roumaji[0]].push(item);
 };
@@ -75,6 +71,7 @@ gojuuon.forEach((item, index) => {
 });
 export const cheatSheet = masterList.map((item) => cheatSheetMap[item]);
 cheatSheet.unshift(gojuuon.slice(0, 5));
+cheatSheet.push([gojuuon[45]]);
 
 export const speak = (input) => {
   const lang = "ja-JP";

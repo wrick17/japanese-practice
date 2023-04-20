@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getList, masterList, selectRandom, shuffle } from "./utils";
+import { getList, masterList, shuffle } from "./utils";
 import { Selector } from "./Selector";
 import { ShowCase } from "./ShowCase";
 import { CheatSheet } from "./CheatSheet";

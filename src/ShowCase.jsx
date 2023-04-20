@@ -11,19 +11,31 @@ export const ShowCase = ({ item }) => {
   }, [item]);
 
   return (
-    <div className="showcase">
-      <div className="block roumaji" onClick={() => speak(item.kana)}>
-        {item.roumaji}
-      </div>
+    <div className="showcase" onClick={() => speak(item.kana)}>
+      <div className="block roumaji">{item.roumaji}</div>
       <div
         className={classNames("block kana", { hiding: !show })}
         onClick={() => {
           if (!show) setShow(true);
         }}
       >
-        {show ? item.kana : "🔎"}
+        {show ? (
+          item.kana
+        ) : (
+          <div>
+            <span>😵‍💫</span>
+            <div>Help Me!</div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
+
+
+
+
+
+
+// "🔎"
