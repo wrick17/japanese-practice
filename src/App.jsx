@@ -14,6 +14,10 @@ const initialValue = [
   })),
 ];
 
+const initialItemsToShow = getList(
+  initialValue.filter((item) => item.checked).map((item) => item.value)
+);
+
 const getItemsToShow = (list) => {
   return shuffle(
     getList(
@@ -27,7 +31,7 @@ const getItemsToShow = (list) => {
 function App() {
   const [list, setList] = useState(initialValue);
   const [currentItem, setCurrentItem] = useState(0);
-  const [itemsToShow, setItemsToShow] = useState(getItemsToShow());
+  const [itemsToShow, setItemsToShow] = useState(initialItemsToShow);
 
   const next = () => {
     if (currentItem < itemsToShow.length - 1) {
@@ -67,5 +71,4 @@ function App() {
 }
 
 export default App;
-
 

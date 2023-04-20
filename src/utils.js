@@ -39,17 +39,20 @@ export const getList = (whitelist = []) => {
   }
   const vowels = getVowels(gojuuon);
   const consonants = getConestants(gojuuon);
-  return [
-    ...vowels,
-    ...consonants.filter((item) => whitelist.includes(item.roumaji[0])),
+  const finalList = [
+    ...(whitelist.includes("v") ? vowels : []),
+    ...consonants.filter((item) =>
+      whitelist.includes(item.roumaji === "chi" ? "t" : item.roumaji[0])
+    ),
   ];
+  return finalList;
 };
 
 const gojuuon = divideList(hiragana).gojuuon;
 
 export const masterList = getMasterList(getConestants(gojuuon));
 
-const insertCharacter = (cheatSheetMap, gojuuon, item, index) => {
+const insertCharacter = (cheatSheetMap, item) => {
   if (item.roumaji === "chi") {
     cheatSheetMap["t"].push(item);
   }
@@ -64,7 +67,7 @@ gojuuon.forEach((item, index) => {
   if (!cheatSheetMap[item.roumaji[0]]) {
     cheatSheetMap[item.roumaji[0]] = [];
   }
-  insertCharacter(cheatSheetMap, gojuuon, item, index);
+  insertCharacter(cheatSheetMap, item);
 });
 export const cheatSheet = masterList.map((item) => cheatSheetMap[item]);
 cheatSheet.unshift(gojuuon.slice(0, 5));
