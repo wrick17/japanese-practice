@@ -33,7 +33,10 @@ export const getMasterList = (consonants) => {
   }, []);
 };
 
-export const getItemsToShow = (whitelist = []) => {
+export const getList = (whitelist = []) => {
+  if (whitelist.length === 0) {
+    return gojuuon;
+  }
   const vowels = getVowels(gojuuon);
   const consonants = getConestants(gojuuon);
   return [
@@ -42,19 +45,13 @@ export const getItemsToShow = (whitelist = []) => {
   ];
 };
 
-export const getList = (whitelist) => {
-  const itemsToShow = getItemsToShow(whitelist);
-
-  return itemsToShow;
-};
-
 const gojuuon = divideList(hiragana).gojuuon;
 
 export const masterList = getMasterList(getConestants(gojuuon));
 
 const insertCharacter = (cheatSheetMap, gojuuon, item, index) => {
-  if (index === 16) {
-    cheatSheetMap["t"].push(gojuuon[16]);
+  if (item.roumaji === "chi") {
+    cheatSheetMap["t"].push(item);
   }
   if (item.roumaji === "n") {
     return;
@@ -92,4 +89,5 @@ export const shuffle = (array) => {
   }
   return array;
 };
+
 

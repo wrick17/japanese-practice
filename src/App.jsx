@@ -5,20 +5,24 @@ import { Selector } from "./Selector";
 import { ShowCase } from "./ShowCase";
 import { CheatSheet } from "./CheatSheet";
 
-const initialValue = masterList.map((item) => ({
-  value: item,
-  label: item,
-  checked: false,
-}));
+const initialValue = [
+  { value: "v", label: "v", checked: true },
+  ...masterList.map((item) => ({
+    value: item,
+    label: item,
+    checked: false,
+  })),
+];
 
-const getItemsToShow = (list) =>
-  shuffle(
+const getItemsToShow = (list) => {
+  return shuffle(
     getList(
       (list || initialValue)
         .filter((item) => item.checked)
         .map((item) => item.value)
     )
   );
+};
 
 function App() {
   const [list, setList] = useState(initialValue);
@@ -36,6 +40,7 @@ function App() {
 
   useEffect(() => {
     setItemsToShow(getItemsToShow(list));
+    setCurrentItem(0);
   }, [list]);
 
   useEffect(() => {
@@ -62,4 +67,5 @@ function App() {
 }
 
 export default App;
+
 

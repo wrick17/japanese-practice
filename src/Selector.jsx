@@ -17,11 +17,6 @@ export const Selector = ({ list, setList }) => {
 
   return (
     <ul>
-      <li>
-        <button className={"button selected"} disabled>
-          v
-        </button>
-      </li>
       {list.map((item) => (
         <li key={item.value}>
           <button
