@@ -2,18 +2,18 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { speak } from './utils';
 
-export const ShowCase = ({ randomItem }) => {
+export const ShowCase = ({ item }) => {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     setShow(false);
-    speak(randomItem.kana);
-  }, [randomItem]);
+    speak(item.kana);
+  }, [item]);
 
   return (
     <div className="showcase">
-      <div className="block roumaji" onClick={() => speak(randomItem.kana)}>
-        {randomItem.roumaji}
+      <div className="block roumaji" onClick={() => speak(item.kana)}>
+        {item.roumaji}
       </div>
       <div
         className={classNames("block kana", { hiding: !show })}
@@ -21,7 +21,7 @@ export const ShowCase = ({ randomItem }) => {
           if (!show) setShow(true);
         }}
       >
-        {show ? randomItem.kana : "🔎"}
+        {show ? item.kana : "🔎"}
       </div>
     </div>
   );

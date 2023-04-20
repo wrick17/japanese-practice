@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import { getList, masterList, selectRandom } from "./utils";
+import { getList, masterList, selectRandom, shuffle } from "./utils";
 import { Selector } from "./Selector";
 import { ShowCase } from "./ShowCase";
-import { CheatSheet } from './CheatSheet';
+import { CheatSheet } from "./CheatSheet";
 
 const initialValue = masterList.map((item) => ({
   value: item,
@@ -11,19 +11,37 @@ const initialValue = masterList.map((item) => ({
   checked: false,
 }));
 
+const getItemsToShow = (list) =>
+  shuffle(
+    getList(
+      (list || initialValue)
+        .filter((item) => item.checked)
+        .map((item) => item.value)
+    )
+  );
+
 function App() {
   const [list, setList] = useState(initialValue);
-  const [randomItem, setRandomItem] = useState();
+  const [currentItem, setCurrentItem] = useState(0);
+  const [itemsToShow, setItemsToShow] = useState(getItemsToShow());
 
-  const itemsToShow = getList(
-    list.filter((item) => item.checked).map((item) => item.value)
-  );
-  const randomize = () => setRandomItem(selectRandom(itemsToShow));
+  const next = () => {
+    if (currentItem < itemsToShow.length - 1) {
+      setCurrentItem(currentItem + 1);
+    } else {
+      setItemsToShow(getItemsToShow(list));
+      setCurrentItem(0);
+    }
+  };
+
+  useEffect(() => {
+    setItemsToShow(getItemsToShow(list));
+  }, [list]);
 
   useEffect(() => {
     const handleKeyPress = (event) => {
       if (event.key === " ") {
-        randomize();
+        next();
       }
     };
     window.addEventListener("keypress", handleKeyPress);
@@ -34,15 +52,14 @@ function App() {
     <div className="select">
       <h2>Remember Hiragana?</h2>
       <Selector list={list} setList={setList} />
-      <button className="switch" onClick={randomize}>
+      <button className="switch" onClick={next}>
         Surprise Me
       </button>
-      {randomItem && <ShowCase randomItem={randomItem} />}
+      <ShowCase item={itemsToShow[currentItem]} />
       <CheatSheet />
     </div>
   );
 }
 
 export default App;
-
 
