@@ -3,6 +3,7 @@ import "./App.css";
 import { getList, masterList, selectRandom } from "./utils";
 import { Selector } from "./Selector";
 import { ShowCase } from "./ShowCase";
+import { CheatSheet } from './CheatSheet';
 
 const initialValue = masterList.map((item) => ({
   value: item,
@@ -19,6 +20,16 @@ function App() {
   );
   const randomize = () => setRandomItem(selectRandom(itemsToShow));
 
+  useEffect(() => {
+    const handleKeyPress = (event) => {
+      if (event.key === " ") {
+        randomize();
+      }
+    };
+    window.addEventListener("keypress", handleKeyPress);
+    return () => window.removeEventListener("keypress", handleKeyPress);
+  }, [itemsToShow]);
+
   return (
     <div className="select">
       <h2>Remember Hiragana?</h2>
@@ -27,9 +38,11 @@ function App() {
         Surprise Me
       </button>
       {randomItem && <ShowCase randomItem={randomItem} />}
+      <CheatSheet />
     </div>
   );
 }
 
 export default App;
+
 

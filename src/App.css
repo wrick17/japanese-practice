@@ -61,6 +61,7 @@ input[type="checkbox"] {
   align-items: center;
   justify-content: center;
   border-radius: 10%;
+  cursor: pointer;
 }
 
 .block.hiding {
@@ -83,3 +84,38 @@ input[type="checkbox"] {
   border-radius: 50%;
 }
 
+.cheatsheet {
+  margin-top: 24px;
+}
+
+.cheatsheet-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.item {
+  font-size: 18px;
+  flex: 0 0 60px;
+  background-color: #111;
+  margin: 4px;
+  padding: 4px 16px;
+  border-radius: 8px;
+}
+
+.item-roumaji {
+  font-size: 80%;
+  opacity: 0.6;
+}
+
+.item-hiragana {
+  font-size: 150%;
+}

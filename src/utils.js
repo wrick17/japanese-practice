@@ -23,7 +23,12 @@ export const getMasterList = (consonants) => {
   consonants.forEach((consonant) => {
     masterList.add(consonant.roumaji[0]);
   });
-  return Array.from(masterList);
+  return Array.from(masterList).reduce((acc, item) => {
+    if (item === "c") {
+      return acc;
+    }
+    return [...acc, item];
+  }, []);
 };
 
 export const getItemsToShow = (whitelist = []) => {
@@ -44,9 +49,45 @@ export const getList = (whitelist) => {
 const gojuuon = divideList(hiragana).gojuuon;
 
 export const masterList = getMasterList(getConestants(gojuuon));
+masterList.push("ϕ");
 
 export const selectRandom = (list) => {
   const randomIndex = Math.floor(Math.random() * list.length);
   return list[randomIndex];
-}
+};
+
+const insertCharacter = (cheatSheetMap, gojuuon, item, index) => {
+  if (index === 16) {
+    cheatSheetMap["t"].push(gojuuon[16]);
+  }
+  if (index === 45) {
+    return (cheatSheetMap["ϕ"] = [gojuuon[45]]);
+  }
+  cheatSheetMap[item.roumaji[0]].push(item);
+};
+
+const cheatSheetMap = {};
+gojuuon.forEach((item, index) => {
+  if (!cheatSheetMap[item.roumaji[0]]) {
+    cheatSheetMap[item.roumaji[0]] = [];
+  }
+  insertCharacter(cheatSheetMap, gojuuon, item, index);
+});
+export const cheatSheet = masterList.map((item) => cheatSheetMap[item]);
+cheatSheet.unshift(gojuuon.slice(0, 5));
+
+console.log(cheatSheet);
+
+export const speak = (input) => {
+  const lang = "ja-JP";
+  const synth = window.speechSynthesis;
+  const voices = synth.getVoices().filter((voice) => voice.lang === lang);
+  let utterance = new SpeechSynthesisUtterance(input);
+  utterance.voice = voices[0];
+  utterance.lang = "ja-JP";
+  utterance.rate = 0.3;
+  utterance.volume = 1;
+  speechSynthesis.speak(utterance);
+};
+
 

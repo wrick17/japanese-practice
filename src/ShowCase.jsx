@@ -1,20 +1,9 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames";
+import { speak } from './utils';
 
 export const ShowCase = ({ randomItem }) => {
   const [show, setShow] = useState(false);
-
-  const speak = (input) => {
-    const lang = "ja-JP";
-    const synth = window.speechSynthesis;
-    const voices = synth.getVoices().filter((voice) => voice.lang === lang);
-    let utterance = new SpeechSynthesisUtterance(input);
-    utterance.voice = voices[0];
-    utterance.lang = "ja-JP";
-    utterance.rate = 0.3;
-    utterance.volume = 1;
-    speechSynthesis.speak(utterance);
-  };
 
   useEffect(() => {
     setShow(false);
