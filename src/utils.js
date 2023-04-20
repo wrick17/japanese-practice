@@ -76,8 +76,6 @@ gojuuon.forEach((item, index) => {
 export const cheatSheet = masterList.map((item) => cheatSheetMap[item]);
 cheatSheet.unshift(gojuuon.slice(0, 5));
 
-console.log(cheatSheet);
-
 export const speak = (input) => {
   const lang = "ja-JP";
   const synth = window.speechSynthesis;
