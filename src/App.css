@@ -48,13 +48,14 @@ input[type="checkbox"] {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  font-size: 12em;
+  font-size: 10em;
   flex-wrap: wrap;
 }
 
 .block {
   background-color: #111;
   flex: 1 0 200px;
+  max-width: 400px;
   margin: 8px 24px;
   aspect-ratio: 1;
   display: flex;
@@ -62,6 +63,15 @@ input[type="checkbox"] {
   justify-content: center;
   border-radius: 10%;
   cursor: pointer;
+}
+
+.block.kana {
+  display: flex;
+  flex-direction: column;
+}
+
+.block.kana .small-subtext {
+  font-size: 32px;
 }
 
 .block.hiding {
@@ -74,6 +84,7 @@ input[type="checkbox"] {
 
 .switch {
   width: 90%;
+  max-width: 300px;
   margin: 16px 0;
   font-size: 1em;
   padding: 12px;
@@ -123,4 +134,8 @@ input[type="checkbox"] {
 
 .item-hiragana {
   font-size: 150%;
+}
+
+.info {
+  padding: 16px;
 }

@@ -4,6 +4,7 @@ import { getList, masterList, shuffle } from "./utils";
 import { Selector } from "./Selector";
 import { ShowCase } from "./ShowCase";
 import { CheatSheet } from "./CheatSheet";
+import { Info } from './Info';
 
 const initialValue = [
   { value: "v", label: "v", checked: true },
@@ -66,6 +67,7 @@ function App() {
       </button>
       <ShowCase item={itemsToShow[currentItem]} />
       <CheatSheet />
+      <Info />
     </div>
   );
 }
