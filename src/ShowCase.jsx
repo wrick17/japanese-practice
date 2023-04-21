@@ -7,11 +7,10 @@ export const ShowCase = ({ item }) => {
 
   useEffect(() => {
     setShow(false);
-    speak(item.kana);
   }, [item]);
 
   return (
-    <>
+    <div>
       <div className="showcase" onClick={() => speak(item.kana)}>
         {show ? (
           <div className={classNames("block kana", { hiding: !show })}>
@@ -30,7 +29,7 @@ export const ShowCase = ({ item }) => {
       >
         {show ? "☝🏻 Here you go!" : "😵‍💫 Help Me!"}
       </button>
-    </>
+    </div>
   );
 };
 

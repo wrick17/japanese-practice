@@ -4,7 +4,7 @@ import { getList, masterList, shuffle } from "./utils";
 import { Selector } from "./Selector";
 import { ShowCase } from "./ShowCase";
 import { CheatSheet } from "./CheatSheet";
-import { Info } from './Info';
+import { Info } from "./Info";
 
 const initialValue = [
   { value: "v", label: "v", checked: true },
@@ -60,12 +60,12 @@ function App() {
 
   return (
     <div className="select">
-      <h2>Remember Hiragana?</h2>
-      <Selector list={list} setList={setList} />
+      <h2>What's the Hiragana for this?</h2>
+      <ShowCase item={itemsToShow[currentItem]} />
       <button className="switch" onClick={next}>
         Surprise Me
       </button>
-      <ShowCase item={itemsToShow[currentItem]} />
+      <Selector list={list} setList={setList} />
       <CheatSheet />
       <Info />
     </div>
