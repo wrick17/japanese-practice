@@ -15,7 +15,7 @@ export const ShowCase = ({ item }) => {
         {!item ? (
           <div className="block kana">
             <div>🥢</div>
-            <div className="small-subtext">Choose Row</div>
+            <div className="smaller-subtext">Pick rows below 👇🏻</div>
           </div>
         ) : show ? (
           <div className={classNames("block kana", { hiding: !show })}>
@@ -37,6 +37,8 @@ export const ShowCase = ({ item }) => {
     </div>
   );
 };
+
+
 
 
 
