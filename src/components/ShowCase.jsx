@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { speak } from "./utils";
+import { speak } from "../utils/utils";
 
 export const ShowCase = ({ item }) => {
   const [show, setShow] = useState(false);
@@ -12,10 +12,15 @@ export const ShowCase = ({ item }) => {
   return (
     <div>
       <div className="showcase" onClick={() => speak(item.kana)}>
-        {show ? (
+        {!item ? (
+          <div className="block kana">
+            <div>🥢</div>
+            <div className="small-subtext">Choose Row</div>
+          </div>
+        ) : show ? (
           <div className={classNames("block kana", { hiding: !show })}>
-            <div className="small-subtext">{item.roumaji}</div>
             <div>{item.kana}</div>
+            <div className="small-subtext">{item.roumaji}</div>
           </div>
         ) : (
           <div className="block roumaji">{item.roumaji}</div>
@@ -32,7 +37,6 @@ export const ShowCase = ({ item }) => {
     </div>
   );
 };
-
 
 
 

@@ -1,4 +1,4 @@
-import { hiragana } from "./constants";
+import { hiragana } from "../constants/constants";
 
 export const divideList = (list) => {
   const dividedList = {};
@@ -10,6 +10,9 @@ export const divideList = (list) => {
   });
   return dividedList;
 };
+
+const { gojuuon, dakuon, handakuon, ...rest } = divideList(hiragana);
+const characters = [...gojuuon, ...dakuon, ...handakuon];
 
 export const getVowels = (list) =>
   list.filter((item) => item.roumaji.length === 1);
@@ -35,10 +38,10 @@ export const getMasterList = (consonants) => {
 
 export const getList = (whitelist = []) => {
   if (whitelist.length === 0) {
-    return gojuuon;
+    return characters;
   }
-  const vowels = getVowels(gojuuon);
-  const consonants = getConestants(gojuuon);
+  const vowels = getVowels(characters);
+  const consonants = getConestants(characters);
   const finalList = [
     ...(whitelist.includes("v") ? vowels : []),
     ...consonants.filter((item) =>
@@ -48,9 +51,7 @@ export const getList = (whitelist = []) => {
   return finalList;
 };
 
-const gojuuon = divideList(hiragana).gojuuon;
-
-export const masterList = getMasterList(getConestants(gojuuon));
+export const masterList = getMasterList(getConestants(characters));
 
 const insertCharacter = (cheatSheetMap, item) => {
   if (item.roumaji === "chi") {
@@ -63,15 +64,15 @@ const insertCharacter = (cheatSheetMap, item) => {
 };
 
 const cheatSheetMap = {};
-gojuuon.forEach((item, index) => {
+characters.forEach((item, index) => {
   if (!cheatSheetMap[item.roumaji[0]]) {
     cheatSheetMap[item.roumaji[0]] = [];
   }
   insertCharacter(cheatSheetMap, item);
 });
 export const cheatSheet = masterList.map((item) => cheatSheetMap[item]);
-cheatSheet.unshift(gojuuon.slice(0, 5));
-cheatSheet.push([gojuuon[45]]);
+cheatSheet.unshift(characters.slice(0, 5));
+cheatSheet.push([characters[45]]);
 
 export const speak = (input) => {
   const lang = "ja-JP";
@@ -92,5 +93,4 @@ export const shuffle = (array) => {
   }
   return array;
 };
-
 

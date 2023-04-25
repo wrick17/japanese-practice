@@ -8,13 +8,13 @@ export const Info = () => {
       </p>
       <p>
         Just select which row you want to practice (you can select multiple rows
-        if you like). White button signifies the selected row. By default only the vowels are selected.
+        if you like). White button signifies the selected row. By default only
+        the vowels are selected.
       </p>
       <p>
-        Click on the "Surprise Me" button to get a random character. Click
-        on the character to hear it. Click on the "Help Me" button to see
-        the character. Click on the "Done" button to move on to the next
-        character.
+        Click on the "Surprise Me" button to get a random character. Click on
+        the character to hear it. Click on the "Help Me" button to see the
+        character. Click on the "Done" button to move on to the next character.
         <br />
         <br />
         NOTE:{" "}
@@ -29,8 +29,10 @@ export const Info = () => {
         </b>{" "}
         button. It'll show you all the characters in a grid.
       </p>
+      <p>
+        <a href="/">Reload</a>
+      </p>
     </div>
   );
 };
-
 

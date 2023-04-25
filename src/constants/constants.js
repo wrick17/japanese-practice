@@ -1,5 +1,3 @@
-export const whitelist = ["gojuuon"];
-
 export const hiragana = [
   {
     kana: "あ",
