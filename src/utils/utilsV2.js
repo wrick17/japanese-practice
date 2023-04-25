@@ -1,8 +1,6 @@
 import { hiragana } from "../constants/constantsV2";
 import { shuffle } from "./utils";
 
-console.clear();
-
 export const getInitialList = () =>
   hiragana.reduce(
     (list, group) => [

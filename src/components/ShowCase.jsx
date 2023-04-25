@@ -11,7 +11,7 @@ export const ShowCase = ({ item }) => {
 
   return (
     <div>
-      <div className="showcase" onClick={() => speak(item.kana)}>
+      <div className="showcase" onClick={() => speak(item?.kana)}>
         {!item ? (
           <div className="block kana">
             <div>🥢</div>
@@ -37,7 +37,6 @@ export const ShowCase = ({ item }) => {
     </div>
   );
 };
-
 
 
 

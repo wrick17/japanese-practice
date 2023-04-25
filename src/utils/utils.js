@@ -75,6 +75,8 @@ cheatSheet.unshift(characters.slice(0, 5));
 cheatSheet.push([characters[45]]);
 
 export const speak = (input) => {
+  if (!input) return;
+
   const lang = "ja-JP";
   const synth = window.speechSynthesis;
   const voices = synth.getVoices().filter((voice) => voice.lang === lang);
