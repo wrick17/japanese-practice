@@ -4,7 +4,8 @@
   text-align: center;
 }
 
-h4, h3 {
+h4,
+h3 {
   margin-bottom: 6px;
 }
 
@@ -79,7 +80,7 @@ input[type="checkbox"] {
 }
 
 .block.kana .smaller-subtext {
-  margin-top: 48px;
+  margin-top: 8px;
   font-size: 16px;
 }
 
@@ -95,9 +96,15 @@ input[type="checkbox"] {
   width: 90%;
   max-width: 300px;
   margin: 16px 0;
-  font-size: 1em;
+  font-size: 1.2em;
+  font-weight: bold;
   padding: 12px;
   border-radius: 40px;
+  height: 50px;
+}
+
+.switch:not(:last-child) {
+  margin-right: 16px;
 }
 
 .reveal {
@@ -164,5 +171,22 @@ input[type="checkbox"] {
 
 .selector-group-item {
   flex-direction: column;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.timer {
+  flex: 0 0 50px;
+  font-size: 120%;
+  text-shadow: 0 0 20px black;
+}
+
+.timer:disabled {
+  opacity: 1;
+  filter: none;
 }
 

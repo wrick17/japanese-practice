@@ -20,11 +20,11 @@
 
 a {
   font-weight: 500;
-  color: orange;
+  color: darkcyan;
   text-decoration: inherit;
 }
 a:hover {
-  color: lightsalmon;
+  color: cyan;
 }
 
 body {
@@ -54,15 +54,20 @@ button {
   color: white;
 }
 button:hover {
-  border-color: lightsalmon;
+  border-color: cyan;
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto darkcyan;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(1);
 }
 
 button:not(:hover).highlight {
-  border-color: orange;
+  border-color: darkcyan;
 }
 
 @media (prefers-color-scheme: light) {
@@ -77,3 +82,4 @@ button:not(:hover).highlight {
     background-color: #f9f9f9;
   }
 }
+

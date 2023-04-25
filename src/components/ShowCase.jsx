@@ -15,7 +15,6 @@ export const ShowCase = ({ item }) => {
         {!item ? (
           <div className="block kana">
             <div>🥢</div>
-            <div className="smaller-subtext">Pick rows below 👇🏻</div>
           </div>
         ) : show ? (
           <div className={classNames("block kana", { hiding: !show })}>
@@ -31,15 +30,15 @@ export const ShowCase = ({ item }) => {
         onClick={() => {
           if (!show) setShow(true);
         }}
+        disabled={!item}
       >
-        {show ? "☝🏻 Here you go!" : "😵‍💫 Help Me!"}
+        {!item
+          ? "First pick some rows below 👇🏻"
+          : show
+          ? "☝🏻 Here you go!"
+          : "😵‍💫 Help Me!"}
       </button>
     </div>
   );
 };
-
-
-
-
-
 
