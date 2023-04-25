@@ -34,9 +34,11 @@ export const getItemsToShow = (list) => {
   return shuffle(
     hiragana.reduce((items, group) => {
       const filteredRows = group.rows.reduce((items, row) => {
-        const rowValue = `${row[0].roumaji[0]}${group.group === "youon" ? "+" : ""}`;
+        const rowValue = `${row[0].roumaji[0]}${
+          group.group === "youon" ? "+" : ""
+        }`;
         if (whitelist.includes(rowValue)) {
-          return [...items, ...row];
+          return [...items, ...row.filter((item) => item.kana)];
         }
         return items;
       }, []);
@@ -44,8 +46,4 @@ export const getItemsToShow = (list) => {
     }, [])
   );
 };
-
-
-
-
 
