@@ -215,3 +215,8 @@ input[type="checkbox"] {
   font-size: 14px;
   padding: 4px 16px;
 }
+
+.speak, .help {
+  margin-left: 8px;
+  width: 160px;
+}

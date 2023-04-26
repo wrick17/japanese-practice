@@ -4,10 +4,14 @@ import { speak } from "../utils/utils";
 
 export const ShowCase = ({ item }) => {
   const [show, setShow] = useState(false);
+  const [announce, setAnnounce] = useState(false);
 
   useEffect(() => {
     setShow(false);
-  }, [item]);
+    if (announce) {
+      speak(item?.kana);
+    }
+  }, [item, announce]);
 
   return (
     <div>
@@ -26,9 +30,9 @@ export const ShowCase = ({ item }) => {
         )}
       </div>
       <button
-        className="show"
+        className="show help"
         onClick={() => {
-          if (!show) setShow(true);
+          setShow(!show);
         }}
         disabled={!item}
       >
@@ -37,6 +41,13 @@ export const ShowCase = ({ item }) => {
           : show
           ? "☝🏻 Here you go!"
           : "😵‍💫 Help Me!"}
+      </button>
+      <button
+        className="show speak"
+        onClick={() => setAnnounce(!announce)}
+        disabled={!item}
+      >
+        📢 {announce ? "Stop" : "Announce"}
       </button>
     </div>
   );
