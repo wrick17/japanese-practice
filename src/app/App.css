@@ -222,10 +222,6 @@ input[type="checkbox"] {
   width: 160px;
 }
 
-h2 {
-  margin-bottom: 32px;
-}
-
 .script-selector {
   text-decoration: underline;
   color: cyan;
