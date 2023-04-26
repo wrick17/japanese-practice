@@ -172,10 +172,11 @@ input[type="checkbox"] {
 
 .selector-group {
   display: flex;
-  max-width: 604px;
+  max-width: 620px;
   flex-direction: column;
   justify-content: center;
   margin: auto;
+  padding: 0 8px;
 }
 
 .selector-group-item {
