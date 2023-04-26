@@ -302,6 +302,7 @@ export const japanese = [
           kana: "ん",
           roumaji: "N",
           type: "gojuuon",
+          kanaK: "ン",
         },
       ],
     ],
