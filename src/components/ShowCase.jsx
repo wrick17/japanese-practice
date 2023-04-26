@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { speak } from "../utils/utils";
+import { speak } from "../utils/utilsV2";
 
 export const ShowCase = ({ item, kana }) => {
   const [show, setShow] = useState(false);
