@@ -526,3 +526,530 @@ export const hiragana = [
   },
 ];
 
+export const katakana = [
+  {
+    kanaK: "ア",
+    roumaji: "a",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "イ",
+    roumaji: "i",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ウ",
+    roumaji: "u",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "エ",
+    roumaji: "e",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "オ",
+    roumaji: "o",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "カ",
+    roumaji: "ka",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "キ",
+    roumaji: "ki",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ク",
+    roumaji: "ku",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ケ",
+    roumaji: "ke",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "コ",
+    roumaji: "ko",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "サ",
+    roumaji: "sa",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "シ",
+    roumaji: "shi",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ス",
+    roumaji: "su",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "セ",
+    roumaji: "se",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ソ",
+    roumaji: "so",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "タ",
+    roumaji: "ta",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "チ",
+    roumaji: "chi",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ツ",
+    roumaji: "tsu",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "テ",
+    roumaji: "te",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ト",
+    roumaji: "to",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ナ",
+    roumaji: "na",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ニ",
+    roumaji: "ni",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ヌ",
+    roumaji: "nu",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ネ",
+    roumaji: "ne",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ノ",
+    roumaji: "no",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ハ",
+    roumaji: "ha",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ヒ",
+    roumaji: "hi",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "フ",
+    roumaji: "hu",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ヘ",
+    roumaji: "he",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ホ",
+    roumaji: "ho",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "マ",
+    roumaji: "ma",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ミ",
+    roumaji: "mi",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ム",
+    roumaji: "mu",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "メ",
+    roumaji: "me",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "モ",
+    roumaji: "mo",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ヤ",
+    roumaji: "ya",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ユ",
+    roumaji: "yu",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ヨ",
+    roumaji: "yo",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ラ",
+    roumaji: "ra",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "リ",
+    roumaji: "ri",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ル",
+    roumaji: "ru",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "レ",
+    roumaji: "re",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ロ",
+    roumaji: "ro",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ワ",
+    roumaji: "wa",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ヲ",
+    roumaji: "wo",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ン",
+    roumaji: "n",
+    type: "gojuuon",
+  },
+  {
+    kanaK: "ガ",
+    roumaji: "ga",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ギ",
+    roumaji: "gi",
+    type: "dakuon",
+  },
+  {
+    kanaK: "グ",
+    roumaji: "gu",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ゲ",
+    roumaji: "ge",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ゴ",
+    roumaji: "go",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ザ",
+    roumaji: "za",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ジ",
+    roumaji: "ji",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ズ",
+    roumaji: "zu",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ゼ",
+    roumaji: "ze",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ゾ",
+    roumaji: "zo",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ダ",
+    roumaji: "da",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ヂ",
+    roumaji: "ji",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ヅ",
+    roumaji: "zu",
+    type: "dakuon",
+  },
+  {
+    kanaK: "デ",
+    roumaji: "de",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ド",
+    roumaji: "do",
+    type: "dakuon",
+  },
+  {
+    kanaK: "バ",
+    roumaji: "ba",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ビ",
+    roumaji: "bi",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ブ",
+    roumaji: "bu",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ベ",
+    roumaji: "be",
+    type: "dakuon",
+  },
+  {
+    kanaK: "ボ",
+    roumaji: "bo",
+    type: "dakuon",
+  },
+  {
+    kanaK: "パ",
+    roumaji: "pa",
+    type: "handakuon",
+  },
+  {
+    kanaK: "ピ",
+    roumaji: "pi",
+    type: "handakuon",
+  },
+  {
+    kanaK: "プ",
+    roumaji: "pu",
+    type: "handakuon",
+  },
+  {
+    kanaK: "ペ",
+    roumaji: "pe",
+    type: "handakuon",
+  },
+  {
+    kanaK: "ポ",
+    roumaji: "po",
+    type: "handakuon",
+  },
+  {
+    kanaK: "ッ",
+    roumaji: "(pause)",
+    type: "sokuon",
+  },
+  {
+    kanaK: "キャ",
+    roumaji: "kya",
+    type: "youon",
+  },
+  {
+    kanaK: "キュ",
+    roumaji: "kyu",
+    type: "youon",
+  },
+  {
+    kanaK: "キョ",
+    roumaji: "kyo",
+    type: "youon",
+  },
+  {
+    kanaK: "シャ",
+    roumaji: "sha",
+    type: "youon",
+  },
+  {
+    kanaK: "シュ",
+    roumaji: "shu",
+    type: "youon",
+  },
+  {
+    kanaK: "ショ",
+    roumaji: "sho",
+    type: "youon",
+  },
+  {
+    kanaK: "チャ",
+    roumaji: "cha",
+    type: "youon",
+  },
+  {
+    kanaK: "チュ",
+    roumaji: "chu",
+    type: "youon",
+  },
+  {
+    kanaK: "チョ",
+    roumaji: "cho",
+    type: "youon",
+  },
+  {
+    kanaK: "ニャ",
+    roumaji: "nya",
+    type: "youon",
+  },
+  {
+    kanaK: "ニュ",
+    roumaji: "nyu",
+    type: "youon",
+  },
+  {
+    kanaK: "ニョ",
+    roumaji: "nyo",
+    type: "youon",
+  },
+  {
+    kanaK: "ヒャ",
+    roumaji: "hya",
+    type: "youon",
+  },
+  {
+    kanaK: "ヒュ",
+    roumaji: "hyu",
+    type: "youon",
+  },
+  {
+    kanaK: "ヒョ",
+    roumaji: "hyo",
+    type: "youon",
+  },
+  {
+    kanaK: "ミャ",
+    roumaji: "mya",
+    type: "youon",
+  },
+  {
+    kanaK: "ミュ",
+    roumaji: "myu",
+    type: "youon",
+  },
+  {
+    kanaK: "ミョ",
+    roumaji: "myo",
+    type: "youon",
+  },
+  {
+    kanaK: "リャ",
+    roumaji: "rya",
+    type: "youon",
+  },
+  {
+    kanaK: "リュ",
+    roumaji: "ryu",
+    type: "youon",
+  },
+  {
+    kanaK: "リョ",
+    roumaji: "ryo",
+    type: "youon",
+  },
+  {
+    kanaK: "ギャ",
+    roumaji: "gya",
+    type: "youon",
+  },
+  {
+    kanaK: "ギュ",
+    roumaji: "gyu",
+    type: "youon",
+  },
+  {
+    kanaK: "ギョ",
+    roumaji: "gyo",
+    type: "youon",
+  },
+  {
+    kanaK: "ジャ",
+    roumaji: "ja",
+    type: "youon",
+  },
+  {
+    kanaK: "ジュ",
+    roumaji: "ju",
+    type: "youon",
+  },
+  {
+    kanaK: "ジョ",
+    roumaji: "jo",
+    type: "youon",
+  },
+  {
+    kanaK: "ビャ",
+    roumaji: "bya",
+    type: "youon",
+  },
+  {
+    kanaK: "ビュ",
+    roumaji: "byu",
+    type: "youon",
+  },
+  {
+    kanaK: "ビョ",
+    roumaji: "byo",
+    type: "youon",
+  },
+  {
+    kanaK: "ピャ",
+    roumaji: "pya",
+    type: "youon",
+  },
+  {
+    kanaK: "ピュ",
+    roumaji: "pyu",
+    type: "youon",
+  },
+  {
+    kanaK: "ピョ",
+    roumaji: "pyo",
+    type: "youon",
+  },
+];

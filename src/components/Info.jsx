@@ -3,7 +3,7 @@ export const Info = () => {
     <div className="info">
       <h2>How to use</h2>
       <p>
-        So you're learning Hiragana. You want to practice writing after hearing
+        So you're learning Japanese. You want to practice writing after hearing
         or seeing the character. This tool helps you do just that.
       </p>
       <p>
@@ -28,6 +28,10 @@ export const Info = () => {
           <u>Show Cheat Sheet</u>
         </b>{" "}
         button. It'll show you all the characters in a grid.
+      </p>
+      <p>
+        If you wish to switch to <b>Katakana</b> or <b>Hiragana</b>, you can use
+        the toggle at the top in the header.
       </p>
       <p>
         <a href="/">Reload</a>

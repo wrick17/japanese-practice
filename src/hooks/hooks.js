@@ -3,7 +3,7 @@ import { getInitialList, getItemsToShow } from "../utils/utilsV2";
 
 const durations = [5, 10, 30];
 
-export const useHiragana = () => {
+export const useJapanese = () => {
   const [list, setList] = useState(getInitialList());
   const [itemsToShow, setItemsToShow] = useState(getItemsToShow(list));
   const [currentItem, setCurrentItem] = useState(0);
@@ -12,6 +12,13 @@ export const useHiragana = () => {
   const [timerRunning, setTimerRunning] = useState(false);
   const timerRef = useRef();
   const remainingRef = useRef(duration);
+  const [kanaScript, setKanaScript] = useState("hiragana");
+
+  const toggleScript = () => {
+    setKanaScript((kanaScript) => {
+      return kanaScript === "hiragana" ? "katakana" : "hiragana";
+    });
+  };
 
   const changeDuration = () => {
     const index = durations.indexOf(duration);
@@ -44,7 +51,7 @@ export const useHiragana = () => {
       setItemsToShow(() => getItemsToShow(list));
       setCurrentItem(() => 0);
     }
-  }, [currentItem, itemsToShow, list, duration, timerRunning]);
+  }, [currentItem, itemsToShow, list, duration, timerRunning, kanaScript]);
 
   const startRemainingTimer = useCallback(() => {
     clearInterval(remainingRef.current);
@@ -74,6 +81,11 @@ export const useHiragana = () => {
     setItemsToShow(getItemsToShow(list));
   }, [list]);
 
+  const kanaMap = {
+    hiragana: "kana",
+    katakana: "kanaK",
+  };
+
   return {
     list,
     setList,
@@ -85,6 +97,11 @@ export const useHiragana = () => {
     duration,
     changeDuration,
     remaining,
+    kanaScript,
+    kana: kanaMap[kanaScript],
+    toggleScript,
   };
 };
+
+
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import classNames from "classnames";
 import { speak } from "../utils/utils";
 
-export const ShowCase = ({ item }) => {
+export const ShowCase = ({ item, kana }) => {
   const [show, setShow] = useState(false);
   const [announce, setAnnounce] = useState(false);
 
@@ -15,14 +15,14 @@ export const ShowCase = ({ item }) => {
 
   return (
     <div>
-      <div className="showcase" onClick={() => speak(item?.kana)}>
+      <div className="showcase" onClick={() => speak(item?.[kana])}>
         {!item ? (
           <div className="block kana">
             <div>🥢</div>
           </div>
         ) : show ? (
           <div className={classNames("block kana", { hiding: !show })}>
-            <div>{item.kana}</div>
+            <div>{item?.[kana]}</div>
             <div className="small-subtext">{item.roumaji}</div>
           </div>
         ) : (
@@ -52,4 +52,8 @@ export const ShowCase = ({ item }) => {
     </div>
   );
 };
+
+
+
+
 

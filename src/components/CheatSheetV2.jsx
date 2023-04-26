@@ -1,9 +1,9 @@
 import { useState } from "react";
 import classNames from "classnames";
 
-import { hiragana } from "../constants/constantsV2";
+import { japanese } from "../constants/constantsV2";
 
-export const CheatSheetV2 = () => {
+export const CheatSheetV2 = ({ kana }) => {
   const [showCheatSheet, setShowCheatSheet] = useState(false);
 
   return (
@@ -15,7 +15,7 @@ export const CheatSheetV2 = () => {
         {showCheatSheet ? "Hide" : "Show"} Cheat Sheet
       </button>
       {showCheatSheet &&
-        hiragana.map(({ group, rows }) => (
+        japanese.map(({ group, rows }) => (
           <div className="table-block" key={group}>
             <h3>{group}</h3>
             <div className="cheatsheet-table">
@@ -28,10 +28,10 @@ export const CheatSheetV2 = () => {
                     item.roumaji ? (
                       <div
                         className="item"
-                        key={item.roumaji + item.kana}
-                        onClick={() => speak(item.kana)}
+                        key={item.roumaji + item[kana]}
+                        onClick={() => speak(item[kana])}
                       >
-                        <div className="item-hiragana">{item.kana}</div>
+                        <div className="item-hiragana">{item[kana]}</div>
                         <div className="item-roumaji">{item.roumaji}</div>
                       </div>
                     ) : (
@@ -49,6 +49,11 @@ export const CheatSheetV2 = () => {
     </div>
   );
 };
+
+
+
+
+
 
 
 

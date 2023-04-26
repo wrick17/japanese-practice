@@ -2,7 +2,7 @@ import { CheatSheetV2 } from "../components/CheatSheetV2";
 import { Info } from "../components/Info";
 import { SelectorV2 } from "../components/SelectorV2";
 import { ShowCase } from "../components/ShowCase";
-import { useHiragana } from "../hooks/hooks";
+import { useJapanese } from "../hooks/hooks";
 
 import "./App.css";
 
@@ -18,12 +18,23 @@ const AppV2 = () => {
     duration,
     changeDuration,
     remaining,
-  } = useHiragana();
+    kanaScript,
+    toggleScript,
+    kana,
+  } = useJapanese();
+
+  const isHiragana = kanaScript === "hiragana";
 
   return (
     <div className="select">
-      <h2>What's the Hiragana for this?</h2>
-      <ShowCase item={itemsToShow[currentItem]} />
+      <h2>
+        What's the{" "}
+        <span onClick={toggleScript} className="script-selector">
+          {isHiragana ? "Hiragana" : "Katakana"}
+        </span>{" "}
+        for this?
+      </h2>
+      <ShowCase item={itemsToShow[currentItem]} kana={kana} />
       <div className="button-group">
         <button
           className="switch highlight"
@@ -55,11 +66,13 @@ const AppV2 = () => {
         </button>
       </div>
       <SelectorV2 list={list} setList={setList} />
-      <CheatSheetV2 />
+      <CheatSheetV2 kana={kana} />
       <Info />
     </div>
   );
 };
 
 export default AppV2;
+
+
 
