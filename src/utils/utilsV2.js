@@ -37,6 +37,9 @@ export const getItemsToShow = (list) => {
         const rowValue = `${row[0].roumaji[0]}${
           group.group === "youon" ? "+" : ""
         }`;
+        if (!whitelist.length) {
+          return [...items, ...row.filter((item) => item.kana)];
+        }
         if (whitelist.includes(rowValue)) {
           return [...items, ...row.filter((item) => item.kana)];
         }

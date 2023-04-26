@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getInitialList, getItemsToShow } from "../utils/utilsV2";
 
-const durations = [10, 15, 30];
+const durations = [5, 10, 30];
 
 export const useHiragana = () => {
   const [list, setList] = useState(getInitialList());
@@ -24,7 +24,6 @@ export const useHiragana = () => {
     clearInterval(remainingRef.current);
     setRemaining(duration);
     setTimerRunning(false);
-    timerRef.current = undefined;
   };
 
   const startRemainingTimer = useCallback(() => {
@@ -33,7 +32,7 @@ export const useHiragana = () => {
     remainingRef.current = setInterval(() => {
       setRemaining((prev) => prev - 1);
     }, 1000);
-  }, [duration]);
+  }, [duration, remainingRef.current]);
 
   const startTimer = () => {
     stopTimer();
@@ -48,7 +47,7 @@ export const useHiragana = () => {
   };
 
   const toggleTimer = () => {
-    if (timerRef.current) {
+    if (timerRunning) {
       stopTimer();
     } else {
       startTimer();
@@ -56,14 +55,16 @@ export const useHiragana = () => {
   };
 
   const next = useCallback(() => {
-    startRemainingTimer();
+    if (timerRunning) {
+      startTimer();
+    }
     if (currentItem < itemsToShow.length - 1) {
       setCurrentItem((currentItem) => currentItem + 1);
     } else {
       setItemsToShow(() => getItemsToShow(list));
       setCurrentItem(() => 0);
     }
-  }, [currentItem, itemsToShow, list, duration]);
+  }, [currentItem, itemsToShow, list, duration, timerRunning]);
 
   useEffect(() => {
     setRemaining(duration);
@@ -86,4 +87,5 @@ export const useHiragana = () => {
     remaining,
   };
 };
+
 
