@@ -33,8 +33,21 @@ export const Info = () => {
         If you wish to switch to <b>Katakana</b> or <b>Hiragana</b>, you can use
         the toggle at the top in the header.
       </p>
+      <br />
       <p>
         <a href="/">Reload</a>
+      </p>
+      <br />
+      <br />
+      <p>
+        Made with <span className="red">♥️</span> by{" "}
+        <a target="__blank" href="https://www.wrick17.com">
+          Wrick
+        </a>{" "}
+        and hosted on{" "}
+        <a target="__blank" href="https://github.com/wrick17/japanese-practice">
+          Github
+        </a>
       </p>
     </div>
   );
