@@ -50,7 +50,7 @@ export const useHiragana = () => {
     clearInterval(remainingRef.current);
     setRemaining(() => duration);
     remainingRef.current = setInterval(() => {
-      setRemaining((prev) => prev - 1);
+      setRemaining((prev) => (prev === 1 ? duration : prev - 1));
     }, 1000);
   }, [duration, remainingRef.current]);
 
