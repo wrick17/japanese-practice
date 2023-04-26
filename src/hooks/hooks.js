@@ -23,27 +23,7 @@ export const useHiragana = () => {
     clearInterval(timerRef.current);
     clearInterval(remainingRef.current);
     setRemaining(duration);
-    setTimerRunning(false);
-  };
-
-  const startRemainingTimer = useCallback(() => {
-    clearInterval(remainingRef.current);
-    setRemaining(duration);
-    remainingRef.current = setInterval(() => {
-      setRemaining((prev) => prev - 1);
-    }, 1000);
-  }, [duration, remainingRef.current]);
-
-  const startTimer = () => {
-    stopTimer();
-    setTimerRunning(true);
-
-    startRemainingTimer();
-
-    timerRef.current = setInterval(() => {
-      setRemaining(duration);
-      next();
-    }, duration * 1000);
+    setTimerRunning(() => false);
   };
 
   const toggleTimer = () => {
@@ -66,8 +46,28 @@ export const useHiragana = () => {
     }
   }, [currentItem, itemsToShow, list, duration, timerRunning]);
 
+  const startRemainingTimer = useCallback(() => {
+    clearInterval(remainingRef.current);
+    setRemaining(() => duration);
+    remainingRef.current = setInterval(() => {
+      setRemaining((prev) => prev - 1);
+    }, 1000);
+  }, [duration, remainingRef.current]);
+
+  const startTimer = useCallback(() => {
+    stopTimer();
+    setTimerRunning(() => true);
+
+    startRemainingTimer();
+
+    timerRef.current = setInterval(() => {
+      setRemaining(() => duration);
+      next();
+    }, duration * 1000);
+  }, [duration, next, timerRef.current, remainingRef.current]);
+
   useEffect(() => {
-    setRemaining(duration);
+    setRemaining(() => duration);
   }, [duration]);
 
   useEffect(() => {
@@ -87,5 +87,4 @@ export const useHiragana = () => {
     remaining,
   };
 };
-
 
