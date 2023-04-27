@@ -53,7 +53,3 @@ export const ShowCase = ({ item, kana }) => {
   );
 };
 
-
-
-
-

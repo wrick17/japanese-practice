@@ -1,17 +1,17 @@
 import { japanese } from "../constants/constantsV2";
 
+const synth = window.speechSynthesis;
+const lang = "ja-JP";
+const voices = synth.getVoices().filter((voice) => voice.lang === lang);
+
 export const speak = (input) => {
   if (!input) return;
-
-  const lang = "ja-JP";
-  const synth = window.speechSynthesis;
-  const voices = synth.getVoices().filter((voice) => voice.lang === lang);
   let utterance = new SpeechSynthesisUtterance(input);
   utterance.voice = voices[0];
   utterance.lang = "ja-JP";
   utterance.rate = 0.3;
   utterance.volume = 1;
-  speechSynthesis.speak(utterance);
+  synth.speak(utterance);
 };
 
 export const shuffle = (array) => {
@@ -21,7 +21,6 @@ export const shuffle = (array) => {
   }
   return array;
 };
-
 
 export const getInitialList = () =>
   japanese.reduce(
@@ -71,5 +70,4 @@ export const getItemsToShow = (list) => {
     }, [])
   );
 };
-
 
