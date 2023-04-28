@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getInitialList, getItemsToShow } from "../utils/utilsV2";
 
-const durations = [5, 10, 30];
+const durations = [1, 5, 10, 30];
 
 export const useJapanese = () => {
   const [list, setList] = useState(getInitialList());
@@ -41,17 +41,24 @@ export const useJapanese = () => {
     }
   };
 
-  const next = useCallback(() => {
+  const reShuffle = () => {
+    setItemsToShow(() => getItemsToShow(list));
+  }
+
+  const next = () => {
     if (timerRunning) {
       startTimer();
     }
-    if (currentItem < itemsToShow.length - 1) {
-      setCurrentItem((currentItem) => currentItem + 1);
-    } else {
-      setItemsToShow(() => getItemsToShow(list));
-      setCurrentItem(() => 0);
-    }
-  }, [currentItem, itemsToShow, list, duration, timerRunning, kanaScript]);
+    setCurrentItem((currentItem) => {
+      if (currentItem < itemsToShow.length - 1) {
+        return currentItem + 1;
+      } else {
+        reShuffle();
+        return 0;
+      }
+    });
+  };
+  // , [currentItem, itemsToShow, list, duration, timerRunning, kanaScript]
 
   const startRemainingTimer = useCallback(() => {
     clearInterval(remainingRef.current);
@@ -61,24 +68,24 @@ export const useJapanese = () => {
     }, 1000);
   }, [duration, remainingRef.current]);
 
-  const startTimer = useCallback(() => {
+  const timerFunction = () => {
+    setRemaining(() => duration);
+    next();
+  };
+
+  const startTimer = () => {
     stopTimer();
     setTimerRunning(() => true);
-
     startRemainingTimer();
-
-    timerRef.current = setInterval(() => {
-      setRemaining(() => duration);
-      next();
-    }, duration * 1000);
-  }, [duration, next, timerRef.current, remainingRef.current]);
+    timerRef.current = setInterval(timerFunction, duration * 1000);
+  };
 
   useEffect(() => {
     setRemaining(() => duration);
   }, [duration]);
 
   useEffect(() => {
-    setItemsToShow(getItemsToShow(list));
+    reShuffle();
   }, [list]);
 
   const kanaMap = {
