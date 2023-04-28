@@ -30,6 +30,11 @@ export const Info = () => {
         button. It'll show you all the characters in a grid.
       </p>
       <p>
+        If you wish to hear what the character sounds like, you can turn on the{" "}
+        <b>Announce</b> button. Every time the character chanages it'll announce
+        the syllable for you.
+      </p>
+      <p>
         If you wish to switch to <b>Katakana</b> or <b>Hiragana</b>, you can use
         the toggle at the top in the header.
       </p>

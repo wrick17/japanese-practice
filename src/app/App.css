@@ -254,3 +254,7 @@ input[type="checkbox"] {
   color: red;
 }
 
+.show-cheatsheet {
+  width: 200px;
+  padding: 8px 24px;
+}
