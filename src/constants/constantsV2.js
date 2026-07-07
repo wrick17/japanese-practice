@@ -177,7 +177,7 @@ export const japanese = [
         },
         {
           kana: "ふ",
-          roumaji: "hu",
+          roumaji: "fu",
           type: "gojuuon",
           kanaK: "フ",
         },
@@ -300,7 +300,7 @@ export const japanese = [
       [
         {
           kana: "ん",
-          roumaji: "N",
+          roumaji: "n",
           type: "gojuuon",
           kanaK: "ン",
         },
@@ -353,13 +353,13 @@ export const japanese = [
           kana: "じ",
           roumaji: "ji",
           type: "dakuten",
-          kanaK: "ヂ",
+          kanaK: "ジ",
         },
         {
           kana: "ず",
           roumaji: "zu",
           type: "dakuten",
-          kanaK: "ヅ",
+          kanaK: "ズ",
         },
         {
           kana: "ぜ",

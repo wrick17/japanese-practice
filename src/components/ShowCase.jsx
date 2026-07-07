@@ -10,9 +10,9 @@ export const ShowCase = ({ item, kana }) => {
   useEffect(() => {
     setShow(false);
     if (announce) {
-      speak(item?.kana);
+      speak(item?.[kana]);
     }
-  }, [item, announce]);
+  }, [item, announce, kana]);
 
   return (
     <div>

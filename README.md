@@ -2,6 +2,14 @@
 
 React app for practicing hiragana and katakana rows.
 
+## Kana Scope
+
+This app teaches the core beginner kana chart: gojuuon, dakuten, handakuten,
+and youon rows for both hiragana and katakana.
+
+Extended katakana combinations used mainly for loanwords, such as ファ, ティ,
+チェ, ウォ, and ヴァ, are intentionally out of scope for now.
+
 ## Tooling
 
 - Package manager and script runner: Bun.

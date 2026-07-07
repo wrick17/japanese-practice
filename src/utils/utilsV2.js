@@ -24,11 +24,17 @@ export const shuffle = (array) => {
   return array;
 };
 
+const getRowValue = (group, row) => {
+  const firstItem = row[0];
+  if (firstItem.kana === "ん") return "N";
+  return `${firstItem.roumaji[0]}${group.group === "youon" ? "+" : ""}`;
+};
+
 export const getInitialList = () =>
   japanese.map((group) => ({
     title: group.group,
     rows: group.rows.map((row) => ({
-      value: `${row[0].roumaji[0]}${group.group === "youon" ? "+" : ""}`,
+      value: getRowValue(group, row),
       checked: false,
     })),
   }));
@@ -43,9 +49,7 @@ export const getItemsToShow = (list) => {
   return shuffle(
     japanese.flatMap((group) =>
       group.rows.flatMap((row) => {
-        const rowValue = `${row[0].roumaji[0]}${
-          group.group === "youon" ? "+" : ""
-        }`;
+        const rowValue = getRowValue(group, row);
         if (!whitelist.length) {
           return row.filter((item) => item.roumaji);
         }
