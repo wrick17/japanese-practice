@@ -5,6 +5,7 @@ import { speak } from "../utils/utilsV2";
 export const ShowCase = ({ item, kana }) => {
   const [show, setShow] = useState(false);
   const [announce, setAnnounce] = useState(false);
+  const playItem = () => speak(item?.[kana]);
 
   useEffect(() => {
     setShow(false);
@@ -15,20 +16,25 @@ export const ShowCase = ({ item, kana }) => {
 
   return (
     <div>
-      <div className="showcase" onClick={() => speak(item?.[kana])}>
+      <button
+        aria-label="Play kana sound"
+        className="showcase"
+        onClick={playItem}
+        type="button"
+      >
         {!item ? (
-          <div className="block kana">
-            <div>🥢</div>
-          </div>
+          <span className="block kana">
+            <span>🥢</span>
+          </span>
         ) : show ? (
-          <div className={classNames("block kana", { hiding: !show })}>
-            <div>{item?.[kana]}</div>
-            <div className="small-subtext">{item.roumaji}</div>
-          </div>
+          <span className={classNames("block kana", { hiding: !show })}>
+            <span>{item?.[kana]}</span>
+            <span className="small-subtext">{item.roumaji}</span>
+          </span>
         ) : (
-          <div className="block roumaji">{item.roumaji}</div>
+          <span className="block roumaji">{item.roumaji}</span>
         )}
-      </div>
+      </button>
       <button
         className="show help"
         onClick={() => {
@@ -39,8 +45,8 @@ export const ShowCase = ({ item, kana }) => {
         {!item
           ? "First pick some rows below 👇🏻"
           : show
-          ? "☝🏻 Here you go!"
-          : "😵‍💫 Help Me!"}
+            ? "☝🏻 Here you go!"
+            : "😵‍💫 Help Me!"}
       </button>
       <button
         className="show speak"
@@ -52,4 +58,3 @@ export const ShowCase = ({ item, kana }) => {
     </div>
   );
 };
-

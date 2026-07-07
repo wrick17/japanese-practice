@@ -15,8 +15,8 @@ export const useJapanese = () => {
   const [kanaScript, setKanaScript] = useState("hiragana");
 
   const toggleScript = () => {
-    setKanaScript((kanaScript) => {
-      return kanaScript === "hiragana" ? "katakana" : "hiragana";
+    setKanaScript((currentScript) => {
+      return currentScript === "hiragana" ? "katakana" : "hiragana";
     });
   };
 
@@ -41,17 +41,17 @@ export const useJapanese = () => {
     }
   };
 
-  const reShuffle = () => {
+  const reShuffle = useCallback(() => {
     setItemsToShow(() => getItemsToShow(list));
-  }
+  }, [list]);
 
   const next = () => {
     if (timerRunning) {
       startTimer();
     }
-    setCurrentItem((currentItem) => {
-      if (currentItem < itemsToShow.length - 1) {
-        return currentItem + 1;
+    setCurrentItem((index) => {
+      if (index < itemsToShow.length - 1) {
+        return index + 1;
       } else {
         reShuffle();
         return 0;
@@ -66,7 +66,7 @@ export const useJapanese = () => {
     remainingRef.current = setInterval(() => {
       setRemaining((prev) => (prev === 1 ? duration : prev - 1));
     }, 1000);
-  }, [duration, remainingRef.current]);
+  }, [duration]);
 
   const timerFunction = () => {
     setRemaining(() => duration);
@@ -86,7 +86,7 @@ export const useJapanese = () => {
 
   useEffect(() => {
     reShuffle();
-  }, [list]);
+  }, [reShuffle]);
 
   const kanaMap = {
     hiragana: "kana",
@@ -109,6 +109,3 @@ export const useJapanese = () => {
     toggleScript,
   };
 };
-
-
-

@@ -29,9 +29,13 @@ const AppV2 = () => {
     <div className="select">
       <h2>
         What's the{" "}
-        <span onClick={toggleScript} className="script-selector">
+        <button
+          className="script-selector"
+          type="button"
+          onClick={toggleScript}
+        >
           {isHiragana ? "Hiragana" : "Katakana"}
-        </span>{" "}
+        </button>{" "}
         for this?
       </h2>
       <ShowCase item={itemsToShow[currentItem]} kana={kana} />
@@ -73,6 +77,3 @@ const AppV2 = () => {
 };
 
 export default AppV2;
-
-
-

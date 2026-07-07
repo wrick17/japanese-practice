@@ -1,0 +1,23 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true,
+    "es2022": true
+  },
+  "plugins": ["typescript", "unicorn", "oxc", "react", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn",
+    "perf": "warn"
+  },
+  "settings": {
+    "react": {
+      "version": "19.2"
+    }
+  },
+  "rules": {
+    "react/no-array-index-key": "off",
+    "react/react-in-jsx-scope": "off"
+  },
+  "ignorePatterns": ["dist", "node_modules"]
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import classNames from "classnames";
 
 import { japanese } from "../constants/constantsV2";
+import { speak } from "../utils/utilsV2";
 
 export const CheatSheetV2 = ({ kana }) => {
   const [showCheatSheet, setShowCheatSheet] = useState(false);
@@ -26,20 +27,21 @@ export const CheatSheetV2 = ({ kana }) => {
                 >
                   {items.map((item, itemIndex) =>
                     item.roumaji ? (
-                      <div
+                      <button
+                        type="button"
                         className="item"
                         key={item.roumaji + item[kana]}
                         onClick={() => speak(item[kana])}
                       >
-                        <div className="item-hiragana">{item[kana]}</div>
-                        <div className="item-roumaji">{item.roumaji}</div>
-                      </div>
+                        <span className="item-hiragana">{item[kana]}</span>
+                        <span className="item-roumaji">{item.roumaji}</span>
+                      </button>
                     ) : (
                       <div
                         className="item empty"
                         key={group + rowIndex + itemIndex}
                       />
-                    )
+                    ),
                   )}
                 </div>
               ))}
@@ -49,11 +51,3 @@ export const CheatSheetV2 = ({ kana }) => {
     </div>
   );
 };
-
-
-
-
-
-
-
-

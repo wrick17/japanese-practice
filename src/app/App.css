@@ -60,6 +60,11 @@ input[type="checkbox"] {
   justify-content: space-around;
   font-size: 10em;
   flex-wrap: wrap;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  padding: 0;
+  width: 100%;
 }
 
 .block {
@@ -227,6 +232,10 @@ input[type="checkbox"] {
   color: cyan;
   position: relative;
   cursor: pointer;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  padding: 0;
 }
 
 .script-selector::after {

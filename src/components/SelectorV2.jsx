@@ -31,7 +31,7 @@ export const SelectorV2 = ({ list, setList }) => {
       return listItem;
     });
     setList(newList);
-  }
+  };
 
   return (
     <div className="selector-group">
@@ -63,6 +63,3 @@ export const SelectorV2 = ({ list, setList }) => {
     </div>
   );
 };
-
-
-
