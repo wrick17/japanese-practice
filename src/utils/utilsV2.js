@@ -1,6 +1,39 @@
+import wordsData from "../constants/wordsV2.json";
 import { japanese } from "../constants/constantsV2";
 
 const lang = "ja-JP";
+
+export const STORAGE_KEY = "japanese-practice-settings-v1";
+
+export const modes = {
+  romajiToKana: "romaji-to-kana",
+  kanaToRomaji: "kana-to-romaji",
+  words: "words",
+};
+
+export const scripts = {
+  hiragana: "hiragana",
+  katakana: "katakana",
+};
+
+export const wordPrompts = {
+  japanese: "japanese",
+  romaji: "romaji",
+  english: "english",
+};
+
+export const defaultSettings = {
+  mode: modes.romajiToKana,
+  kanaScript: scripts.hiragana,
+  shuffle: false,
+  wordPrompt: wordPrompts.japanese,
+  selectedRows: ["gojuuon:a"],
+};
+
+const kanaMap = {
+  [scripts.hiragana]: "kana",
+  [scripts.katakana]: "kanaK",
+};
 
 export const speak = (input) => {
   if (!input) return;
@@ -17,11 +50,12 @@ export const speak = (input) => {
 };
 
 export const shuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+    [copy[i], copy[j]] = [copy[j], copy[i]];
   }
-  return array;
+  return copy;
 };
 
 const getRowValue = (group, row) => {
@@ -30,34 +64,171 @@ const getRowValue = (group, row) => {
   return `${firstItem.roumaji[0]}${group.group === "youon" ? "+" : ""}`;
 };
 
-export const getInitialList = () =>
-  japanese.map((group) => ({
+const getRowId = (group, row) => `${group.group}:${getRowValue(group, row)}`;
+
+const rowDefinitions = japanese.flatMap((group) =>
+  group.rows.map((row) => ({
+    id: getRowId(group, row),
+    value: getRowValue(group, row),
+    group: group.group,
+    row,
+  })),
+);
+
+const rowIds = new Set(rowDefinitions.map((row) => row.id));
+const modeValues = new Set(Object.values(modes));
+const scriptValues = new Set(Object.values(scripts));
+const wordPromptValues = new Set(Object.values(wordPrompts));
+
+const unitsByScript = {
+  [scripts.hiragana]: rowDefinitions
+    .flatMap(({ row }) =>
+      row.filter((item) => item.roumaji).map((item) => item.kana),
+    )
+    .toSorted((a, b) => b.length - a.length),
+  [scripts.katakana]: rowDefinitions
+    .flatMap(({ row }) =>
+      row.filter((item) => item.roumaji).map((item) => item.kanaK),
+    )
+    .toSorted((a, b) => b.length - a.length),
+};
+
+export const getKanaKey = (kanaScript) =>
+  kanaMap[kanaScript] ?? kanaMap.hiragana;
+
+export const normalizeSettings = (settings = {}) => {
+  const hasSelectedRows = Array.isArray(settings.selectedRows);
+  const selectedRows = hasSelectedRows
+    ? settings.selectedRows.filter((row) => rowIds.has(row))
+    : defaultSettings.selectedRows;
+
+  return {
+    mode: modeValues.has(settings.mode) ? settings.mode : defaultSettings.mode,
+    kanaScript: scriptValues.has(settings.kanaScript)
+      ? settings.kanaScript
+      : defaultSettings.kanaScript,
+    shuffle:
+      typeof settings.shuffle === "boolean"
+        ? settings.shuffle
+        : defaultSettings.shuffle,
+    wordPrompt: wordPromptValues.has(settings.wordPrompt)
+      ? settings.wordPrompt
+      : defaultSettings.wordPrompt,
+    selectedRows,
+  };
+};
+
+export const loadSettings = (storage = globalThis.localStorage) => {
+  try {
+    const saved = storage?.getItem(STORAGE_KEY);
+    return saved ? normalizeSettings(JSON.parse(saved)) : defaultSettings;
+  } catch {
+    return defaultSettings;
+  }
+};
+
+export const saveSettings = (settings, storage = globalThis.localStorage) => {
+  try {
+    storage?.setItem(STORAGE_KEY, JSON.stringify(normalizeSettings(settings)));
+  } catch {
+    return;
+  }
+};
+
+export const clearSettings = (storage = globalThis.localStorage) => {
+  try {
+    storage?.removeItem(STORAGE_KEY);
+  } catch {
+    return;
+  }
+};
+
+export const getInitialList = (selectedRows = defaultSettings.selectedRows) => {
+  const selected = new Set(selectedRows);
+  return japanese.map((group) => ({
     title: group.group,
     rows: group.rows.map((row) => ({
+      id: getRowId(group, row),
       value: getRowValue(group, row),
-      checked: false,
+      checked: selected.has(getRowId(group, row)),
     })),
   }));
+};
 
-const getWhiteList = (list) =>
+export const getSelectedRows = (list) =>
   list.flatMap((group) =>
-    group.rows.filter((row) => row.checked).map((row) => row.value),
+    group.rows.filter((row) => row.checked).map((row) => row.id),
   );
 
-export const getItemsToShow = (list) => {
-  const whitelist = getWhiteList(list);
-  return shuffle(
-    japanese.flatMap((group) =>
-      group.rows.flatMap((row) => {
-        const rowValue = getRowValue(group, row);
-        if (!whitelist.length) {
-          return row.filter((item) => item.roumaji);
-        }
-        if (whitelist.includes(rowValue)) {
-          return row.filter((item) => item.roumaji);
-        }
-        return [];
-      }),
-    ),
+const getSelectedKana = (list, kanaScript) => {
+  const selectedRows = new Set(getSelectedRows(list));
+  const kanaKey = getKanaKey(kanaScript);
+  return new Set(
+    rowDefinitions.flatMap(({ id, row }) => {
+      if (!selectedRows.has(id)) return [];
+      return row.filter((item) => item.roumaji).map((item) => item[kanaKey]);
+    }),
   );
+};
+
+const segmentKana = (input, kanaScript) => {
+  const units = unitsByScript[kanaScript];
+  const segments = [];
+  let index = 0;
+
+  while (index < input.length) {
+    const unit = units.find((value) => input.startsWith(value, index));
+    if (!unit) return [];
+    segments.push(unit);
+    index += unit.length;
+  }
+
+  return segments;
+};
+
+const getKanaItems = (list, kanaScript) => {
+  const selectedRows = new Set(getSelectedRows(list));
+  const kanaKey = getKanaKey(kanaScript);
+
+  if (!selectedRows.size) return [];
+
+  return rowDefinitions.flatMap(({ id, row }) => {
+    if (!selectedRows.has(id)) return [];
+    return row
+      .filter((item) => item.roumaji)
+      .map((item) =>
+        Object.assign({}, item, {
+          kind: "kana",
+          japanese: item[kanaKey],
+        }),
+      );
+  });
+};
+
+const getWordItems = (list, kanaScript) => {
+  const selectedKana = getSelectedKana(list, kanaScript);
+  if (!selectedKana.size) return [];
+
+  return wordsData.words
+    .filter((word) => word.script === kanaScript)
+    .filter((word) => {
+      const segments = segmentKana(word.japanese, kanaScript);
+      return (
+        segments.length > 0 && segments.every((unit) => selectedKana.has(unit))
+      );
+    })
+    .map((word) =>
+      Object.assign({}, word, {
+        kind: "word",
+      }),
+    );
+};
+
+export const getDeck = ({ list, mode, kanaScript, shuffle: shouldShuffle }) => {
+  const items =
+    mode === modes.words
+      ? getWordItems(list, kanaScript)
+      : getKanaItems(list, kanaScript);
+
+  return mode === modes.words || shouldShuffle ? shuffle(items) : items;
 };

@@ -5,7 +5,7 @@ export const SelectorV2 = ({ list, setList }) => {
     const newList = list.map((listItem) => ({
       ...listItem,
       rows: listItem.rows.map((row) => {
-        if (row.value === item.value) {
+        if (row.id === item.id) {
           return {
             ...row,
             checked: !row.checked,
@@ -42,6 +42,7 @@ export const SelectorV2 = ({ list, setList }) => {
             <button
               className={classNames("button batch", { selected: allChecked })}
               onClick={() => toggleAll(group, allChecked)}
+              type="button"
             >
               All
             </button>
@@ -51,6 +52,7 @@ export const SelectorV2 = ({ list, setList }) => {
                   <button
                     className={classNames("button", { selected: item.checked })}
                     onClick={() => onSelect(item)}
+                    type="button"
                   >
                     {item.value}
                   </button>

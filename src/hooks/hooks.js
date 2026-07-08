@@ -1,111 +1,80 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { getInitialList, getItemsToShow } from "../utils/utilsV2";
-
-const durations = [1, 5, 10, 30];
+import { useEffect, useMemo, useState } from "react";
+import {
+  clearSettings,
+  defaultSettings,
+  getDeck,
+  getInitialList,
+  getKanaKey,
+  getSelectedRows,
+  loadSettings,
+  normalizeSettings,
+  saveSettings,
+} from "../utils/utilsV2";
 
 export const useJapanese = () => {
-  const [list, setList] = useState(getInitialList());
-  const [itemsToShow, setItemsToShow] = useState(getItemsToShow(list));
+  const [settings, setSettings] = useState(loadSettings);
+  const [list, setList] = useState(() => getInitialList(settings.selectedRows));
   const [currentItem, setCurrentItem] = useState(0);
-  const [duration, setDuration] = useState(durations[0]);
-  const [remaining, setRemaining] = useState(duration);
-  const [timerRunning, setTimerRunning] = useState(false);
-  const timerRef = useRef();
-  const remainingRef = useRef(duration);
-  const [kanaScript, setKanaScript] = useState("hiragana");
+  const [cycle, setCycle] = useState(0);
 
-  const toggleScript = () => {
-    setKanaScript((currentScript) => {
-      return currentScript === "hiragana" ? "katakana" : "hiragana";
-    });
+  const deck = useMemo(
+    () => getDeck({ ...settings, list, cycle }),
+    [cycle, list, settings],
+  );
+
+  const updateSettings = (nextSettings) => {
+    setSettings((current) =>
+      normalizeSettings({
+        ...current,
+        ...nextSettings,
+        selectedRows: getSelectedRows(list),
+      }),
+    );
+    setCurrentItem(0);
   };
-
-  const changeDuration = () => {
-    const index = durations.indexOf(duration);
-    const nextIndex = index + 1 === durations.length ? 0 : index + 1;
-    setDuration(durations[nextIndex]);
-  };
-
-  const stopTimer = () => {
-    clearInterval(timerRef.current);
-    clearInterval(remainingRef.current);
-    setRemaining(duration);
-    setTimerRunning(() => false);
-  };
-
-  const toggleTimer = () => {
-    if (timerRunning) {
-      stopTimer();
-    } else {
-      startTimer();
-    }
-  };
-
-  const reShuffle = useCallback(() => {
-    setItemsToShow(() => getItemsToShow(list));
-  }, [list]);
 
   const next = () => {
-    if (timerRunning) {
-      startTimer();
-    }
+    if (!deck.length) return;
+
     setCurrentItem((index) => {
-      if (index < itemsToShow.length - 1) {
-        return index + 1;
-      } else {
-        reShuffle();
-        return 0;
-      }
+      if (index < deck.length - 1) return index + 1;
+      if (settings.shuffle) setCycle((value) => value + 1);
+      return 0;
     });
   };
-  // , [currentItem, itemsToShow, list, duration, timerRunning, kanaScript]
 
-  const startRemainingTimer = useCallback(() => {
-    clearInterval(remainingRef.current);
-    setRemaining(() => duration);
-    remainingRef.current = setInterval(() => {
-      setRemaining((prev) => (prev === 1 ? duration : prev - 1));
-    }, 1000);
-  }, [duration]);
-
-  const timerFunction = () => {
-    setRemaining(() => duration);
-    next();
-  };
-
-  const startTimer = () => {
-    stopTimer();
-    setTimerRunning(() => true);
-    startRemainingTimer();
-    timerRef.current = setInterval(timerFunction, duration * 1000);
+  const reset = () => {
+    clearSettings();
+    setSettings(defaultSettings);
+    setList(getInitialList(defaultSettings.selectedRows));
+    setCurrentItem(0);
+    setCycle((value) => value + 1);
   };
 
   useEffect(() => {
-    setRemaining(() => duration);
-  }, [duration]);
+    setCurrentItem(0);
+  }, [list]);
 
   useEffect(() => {
-    reShuffle();
-  }, [reShuffle]);
+    if (currentItem >= deck.length) setCurrentItem(0);
+  }, [currentItem, deck.length]);
 
-  const kanaMap = {
-    hiragana: "kana",
-    katakana: "kanaK",
-  };
+  useEffect(() => {
+    saveSettings({
+      ...settings,
+      selectedRows: getSelectedRows(list),
+    });
+  }, [list, settings]);
 
   return {
     list,
     setList,
-    itemsToShow,
+    deck,
     next,
     currentItem,
-    timerRunning,
-    toggleTimer,
-    duration,
-    changeDuration,
-    remaining,
-    kanaScript,
-    kana: kanaMap[kanaScript],
-    toggleScript,
+    settings,
+    updateSettings,
+    reset,
+    kana: getKanaKey(settings.kanaScript),
   };
 };

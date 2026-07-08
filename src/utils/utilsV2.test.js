@@ -1,7 +1,18 @@
 import { expect, test } from "bun:test";
 
 import { japanese } from "../constants/constantsV2";
-import { getInitialList, getItemsToShow } from "./utilsV2";
+import {
+  clearSettings,
+  defaultSettings,
+  getDeck,
+  getInitialList,
+  loadSettings,
+  modes,
+  saveSettings,
+  scripts,
+  shuffle,
+  STORAGE_KEY,
+} from "./utilsV2";
 
 const expectedCoreKana = new Map([
   ["あ", { kanaK: "ア", roumaji: "a" }],
@@ -128,6 +139,15 @@ const getKanaItems = () =>
 const countBy = (items, key) =>
   items.filter((item) => item.kanaK === key).length;
 
+const createStorage = (initial = {}) => {
+  const store = new Map(Object.entries(initial));
+  return {
+    getItem: (key) => store.get(key) ?? null,
+    setItem: (key, value) => store.set(key, value),
+    removeItem: (key) => store.delete(key),
+  };
+};
+
 test("builds one selector row for each kana row", () => {
   const list = getInitialList();
   const expectedRows = japanese.reduce(
@@ -136,7 +156,11 @@ test("builds one selector row for each kana row", () => {
   );
 
   expect(list[0].title).toBe("gojuuon");
-  expect(list[0].rows[0]).toEqual({ value: "a", checked: false });
+  expect(list[0].rows[0]).toEqual({
+    id: "gojuuon:a",
+    value: "a",
+    checked: true,
+  });
   expect(list.flatMap((group) => group.rows)).toHaveLength(expectedRows);
 });
 
@@ -149,18 +173,142 @@ test("keeps the standalone n selector distinct from the na row", () => {
 });
 
 test("filters practice items by checked row", () => {
-  const list = getInitialList();
+  const list = getInitialList([]);
   for (const group of list) {
     for (const row of group.rows) {
       row.checked = group.title === "gojuuon" && row.value === "a";
     }
   }
 
-  const roumaji = getItemsToShow(list)
+  const roumaji = getDeck({
+    list,
+    mode: modes.romajiToKana,
+    kanaScript: scripts.hiragana,
+    shuffle: false,
+  })
     .map((item) => item.roumaji)
     .toSorted();
 
   expect(roumaji).toEqual(["a", "e", "i", "o", "u"]);
+});
+
+test("uses sequential kana order when shuffle is off", () => {
+  const deck = getDeck({
+    list: getInitialList(["gojuuon:a"]),
+    mode: modes.romajiToKana,
+    kanaScript: scripts.hiragana,
+    shuffle: false,
+  });
+
+  expect(deck.map((item) => item.roumaji)).toEqual(["a", "i", "u", "e", "o"]);
+});
+
+test("leaves input untouched when shuffling", () => {
+  const input = ["a", "i", "u", "e", "o"];
+  const output = shuffle(input);
+
+  expect(input).toEqual(["a", "i", "u", "e", "o"]);
+  expect(output.toSorted()).toEqual(input.toSorted());
+});
+
+test("always shuffles word decks", () => {
+  const originalRandom = Math.random;
+  Math.random = () => 0;
+
+  try {
+    const args = {
+      list: getInitialList(["gojuuon:a"]),
+      mode: modes.words,
+      kanaScript: scripts.hiragana,
+    };
+    const forcedShuffle = getDeck({ ...args, shuffle: false }).map(
+      (item) => item.japanese,
+    );
+    const explicitShuffle = getDeck({ ...args, shuffle: true }).map(
+      (item) => item.japanese,
+    );
+
+    expect(forcedShuffle.length).toBeGreaterThan(1);
+    expect(forcedShuffle).toEqual(explicitShuffle);
+  } finally {
+    Math.random = originalRandom;
+  }
+});
+
+test("returns no cards when no rows are selected", () => {
+  const deck = getDeck({
+    list: getInitialList([]),
+    mode: modes.romajiToKana,
+    kanaScript: scripts.hiragana,
+    shuffle: false,
+  });
+
+  expect(deck).toEqual([]);
+});
+
+test("loads, saves, and clears local settings", () => {
+  const storage = createStorage();
+  const settings = {
+    mode: modes.words,
+    kanaScript: scripts.katakana,
+    shuffle: true,
+    selectedRows: ["gojuuon:a", "missing"],
+  };
+
+  saveSettings(settings, storage);
+  expect(loadSettings(storage)).toEqual({
+    ...defaultSettings,
+    mode: modes.words,
+    kanaScript: scripts.katakana,
+    shuffle: true,
+    selectedRows: ["gojuuon:a"],
+  });
+
+  clearSettings(storage);
+  expect(storage.getItem(STORAGE_KEY)).toBeNull();
+});
+
+test("falls back to defaults for corrupt settings", () => {
+  const storage = createStorage({ [STORAGE_KEY]: "{" });
+
+  expect(loadSettings(storage)).toEqual(defaultSettings);
+});
+
+test("filters hiragana words strictly by selected rows", () => {
+  const deck = getDeck({
+    list: getInitialList(["gojuuon:a"]),
+    mode: modes.words,
+    kanaScript: scripts.hiragana,
+    shuffle: false,
+  });
+
+  expect(deck.length).toBeGreaterThan(0);
+  expect(deck.some((word) => word.japanese === "あい")).toBe(true);
+  for (const word of deck) {
+    expect(/^[あいうえお]+$/.test(word.japanese)).toBe(true);
+  }
+});
+
+test("katakana word mode uses real katakana words", () => {
+  const list = getInitialList();
+  for (const group of list) {
+    for (const row of group.rows) {
+      row.checked = true;
+    }
+  }
+
+  const deck = getDeck({
+    list,
+    mode: modes.words,
+    kanaScript: scripts.katakana,
+    shuffle: false,
+  });
+
+  expect(deck.length).toBeGreaterThan(0);
+  for (const word of deck) {
+    expect(word.script).toBe(scripts.katakana);
+    expect(/^[\u30A1-\u30FA\u30FD-\u30FF]+$/.test(word.japanese)).toBe(true);
+  }
 });
 
 test("core kana table uses accurate katakana and romaji", () => {

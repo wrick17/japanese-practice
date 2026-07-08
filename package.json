@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "rsbuild dev --host 0.0.0.0",
     "build": "rsbuild build",
+    "generate:words": "bun scripts/generateWords.js",
     "preview": "rsbuild preview --host 0.0.0.0",
     "lint": "oxlint .",
     "format": "oxfmt .",
@@ -22,6 +23,7 @@
     "@rsbuild/plugin-react": "^2.1.0",
     "oxfmt": "^0.58.0",
     "oxlint": "^1.73.0",
-    "rsbuild-plugin-pwa": "^2.10.0"
+    "rsbuild-plugin-pwa": "^2.10.0",
+    "wanakana": "^5.3.1"
   }
 }
