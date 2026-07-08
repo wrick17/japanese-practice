@@ -71,9 +71,9 @@ Close button, or a click outside the popup.
 - Formatting: Oxfmt with 2 spaces, semicolons, double quotes, and 80-column wrapping.
 - Tests: Bun test.
 - Deployment target: Cloudflare Pages.
-- Deployment workflow: pushes to `master` install, format-check, lint, test,
-  build, and deploy `dist` with Bun and Wrangler when the
-  `CLOUDFLARE_API_TOKEN` GitHub secret is configured.
+- CI workflow: pushes to `master` install, format-check, lint, test, and build.
+- Deployment workflow: Cloudflare Pages Git integration builds and deploys
+  pushes to `master`.
 
 ## Cloudflare Pages
 
@@ -81,6 +81,8 @@ Close button, or a click outside the popup.
 - Production branch: `master`.
 - Build command: `bun run build`.
 - Build output directory: `dist`.
+- Automatic production branch deployments: enabled.
+- Git source: `wrick17/japanese-practice`.
 - Custom domain: `japanese.wrick17.com`.
 - DNS target: `japanese-practice-c5y.pages.dev` after the custom domain is added
   to the Pages project.
@@ -88,10 +90,8 @@ Close button, or a click outside the popup.
   first so Cloudflare provisions the route/certificate correctly.
 - DNS record: proxied CNAME `japanese.wrick17.com` to
   `japanese-practice-c5y.pages.dev`.
-- GitHub Actions secret required for automatic deploys:
-  `CLOUDFLARE_API_TOKEN` with Cloudflare Pages edit access.
-- If the token secret is missing, CI still validates the app and skips only the
-  deploy step.
+- GitHub Actions validates only; it does not deploy. Use `bun run deploy` only
+  for an explicit manual Direct Upload fallback.
 
 ## Scripts
 
