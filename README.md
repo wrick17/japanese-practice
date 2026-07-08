@@ -19,7 +19,8 @@ and offline word practice.
   practice/study sections.
 - The practice card keeps a stable size when answers are revealed, and announce
   mode does not hide a revealed answer.
-- Defaults: Hiragana, vowel row, sequential order, Romaji to Japanese mode.
+- Defaults: Hiragana, vowel row, sequential order, Romaji to Japanese mode, and
+  Romaji prompt for Words mode.
 - The shuffle toggle applies to character decks; word decks always shuffle.
 - Settings are stored in `localStorage` under
   `japanese-practice-settings-v1`; Reset restores defaults.

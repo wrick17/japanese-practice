@@ -127,7 +127,14 @@ const AppV2 = () => {
                 label: modeLabels[mode],
                 value: mode,
               }))}
-              onChange={(mode) => updateSettings({ mode })}
+              onChange={(mode) =>
+                updateSettings({
+                  mode,
+                  ...(mode === modes.words
+                    ? { wordPrompt: wordPrompts.romaji }
+                    : {}),
+                })
+              }
             />
           </div>
           {settings.mode === modes.words && (

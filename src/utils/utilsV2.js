@@ -26,7 +26,7 @@ export const defaultSettings = {
   mode: modes.romajiToKana,
   kanaScript: scripts.hiragana,
   shuffle: false,
-  wordPrompt: wordPrompts.japanese,
+  wordPrompt: wordPrompts.romaji,
   selectedRows: ["gojuuon:a"],
 };
 

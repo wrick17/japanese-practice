@@ -12,6 +12,7 @@ import {
   scripts,
   shuffle,
   STORAGE_KEY,
+  wordPrompts,
 } from "./utilsV2";
 
 const expectedCoreKana = new Map([
@@ -233,6 +234,11 @@ test("always shuffles word decks", () => {
   } finally {
     Math.random = originalRandom;
   }
+});
+
+test("defaults word prompts to romaji", () => {
+  expect(defaultSettings.wordPrompt).toBe(wordPrompts.romaji);
+  expect(loadSettings(createStorage()).wordPrompt).toBe(wordPrompts.romaji);
 });
 
 test("returns no cards when no rows are selected", () => {
