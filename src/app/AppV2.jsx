@@ -1,10 +1,16 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CheatSheetV2 } from "../components/CheatSheetV2";
 import { Info } from "../components/Info";
 import { SelectorV2 } from "../components/SelectorV2";
 import { ShowCase } from "../components/ShowCase";
 import { useJapanese } from "../hooks/hooks";
-import { modes, scripts, wordPrompts } from "../utils/utilsV2";
+import {
+  getKeyboardShortcutAction,
+  keyboardShortcutLegend,
+  shortcutActions,
+} from "../utils/keyboardShortcuts";
+import { isOutsideDialog } from "../utils/dialog";
+import { modes, scripts, speak, wordPrompts } from "../utils/utilsV2";
 
 import "./App.css";
 
@@ -72,6 +78,35 @@ const Logo = () => (
   </div>
 );
 
+const ShortcutDialog = ({ dialogRef }) => (
+  <dialog
+    aria-labelledby="shortcut-dialog-title"
+    className="shortcut-dialog"
+    ref={dialogRef}
+  >
+    <div className="shortcut-panel">
+      <div className="shortcut-header">
+        <h2 id="shortcut-dialog-title">Keyboard shortcuts</h2>
+        <form method="dialog">
+          <button className="shortcut-close" type="submit">
+            Close
+          </button>
+        </form>
+      </div>
+      <dl className="shortcut-list">
+        {keyboardShortcutLegend.map((shortcut) => (
+          <div className="shortcut-row" key={shortcut.key}>
+            <dt>
+              <kbd>{shortcut.key}</kbd>
+            </dt>
+            <dd>{shortcut.description}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </dialog>
+);
+
 const AppV2 = () => {
   const {
     list,
@@ -84,8 +119,27 @@ const AppV2 = () => {
     reset,
     kana,
   } = useJapanese();
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [announce, setAnnounce] = useState(false);
+  const shortcutsDialogRef = useRef(null);
   const item = deck[currentItem];
   const isWordsMode = settings.mode === modes.words;
+  const speechText = item?.japanese;
+
+  const openShortcuts = useCallback(() => {
+    const dialog = shortcutsDialogRef.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
+
+  const playSound = useCallback(() => speak(speechText), [speechText]);
+
+  useEffect(() => {
+    setShowAnswer(false);
+  }, [item, settings.mode, settings.wordPrompt]);
+
+  useEffect(() => {
+    if (announce) speak(speechText);
+  }, [item, announce, speechText]);
 
   useEffect(() => {
     const closeDropdowns = (event) => {
@@ -99,6 +153,48 @@ const AppV2 = () => {
     document.addEventListener("click", closeDropdowns);
     return () => document.removeEventListener("click", closeDropdowns);
   }, []);
+
+  useEffect(() => {
+    const dialog = shortcutsDialogRef.current;
+    if (!dialog) return;
+
+    const closeOnBackdropClick = (event) => {
+      if (isOutsideDialog(event)) dialog.close();
+    };
+
+    dialog.addEventListener("click", closeOnBackdropClick);
+    return () => dialog.removeEventListener("click", closeOnBackdropClick);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      const action = getKeyboardShortcutAction(event);
+      if (!action) return;
+
+      if (action === shortcutActions.openLegend) {
+        event.preventDefault();
+        openShortcuts();
+        return;
+      }
+
+      if (!item || shortcutsDialogRef.current?.open) return;
+
+      event.preventDefault();
+
+      if (action === shortcutActions.toggleAnswer) {
+        setShowAnswer((current) => !current);
+      } else if (action === shortcutActions.nextCard) {
+        next();
+      } else if (action === shortcutActions.playSound) {
+        playSound();
+      } else if (action === shortcutActions.toggleAnnounce) {
+        setAnnounce((current) => !current);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [item, next, openShortcuts, playSound]);
 
   return (
     <main className="select">
@@ -160,6 +256,15 @@ const AppV2 = () => {
             <button className="reset-button" onClick={reset} type="button">
               Reset
             </button>
+            <button
+              aria-haspopup="dialog"
+              aria-label="Keyboard shortcuts"
+              className="shortcut-button"
+              onClick={openShortcuts}
+              type="button"
+            >
+              ?
+            </button>
           </div>
         </div>
       </header>
@@ -169,6 +274,11 @@ const AppV2 = () => {
           <ShowCase
             item={item}
             mode={settings.mode}
+            announce={announce}
+            onSpeak={playSound}
+            onToggleAnnounce={() => setAnnounce((current) => !current)}
+            onToggleAnswer={() => setShowAnswer((current) => !current)}
+            show={showAnswer}
             wordPrompt={settings.wordPrompt}
           />
 
@@ -194,6 +304,7 @@ const AppV2 = () => {
 
       <CheatSheetV2 kana={kana} />
       <Info />
+      <ShortcutDialog dialogRef={shortcutsDialogRef} />
     </main>
   );
 };

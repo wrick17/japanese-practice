@@ -1,7 +1,7 @@
 # Japanese Practice
 
 React app for learning hiragana and katakana with row-based character drills
-and offline word practice.
+and local word practice.
 
 ## Current App State
 
@@ -24,6 +24,8 @@ and offline word practice.
 - The shuffle toggle applies to character decks; word decks always shuffle.
 - Settings are stored in `localStorage` under
   `japanese-practice-settings-v1`; Reset restores defaults.
+- Keyboard shortcuts are available from the `?` popup in the header.
+- Existing service workers from older PWA builds are unregistered on app load.
 - The timer feature was removed.
 
 ## Kana Scope
@@ -50,10 +52,21 @@ The generator downloads the latest JMdict-Simplified common English archive,
 keeps only words that can be segmented into the kana rows this app already
 teaches, stores the first English gloss, and writes stable formatted JSON.
 
+## Keyboard Shortcuts
+
+Open the legend with the `?` button or the `?` key. Close it with `Esc`, the
+Close button, or a click outside the popup.
+
+- `Space`: reveal or hide the answer.
+- `Enter`: move to the next card.
+- `P`: play the Japanese audio.
+- `A`: start or stop announce mode.
+- `Esc`: close the popup.
+
 ## Tooling
 
 - Package manager and script runner: Bun.
-- Build tool: Rsbuild with React and PWA plugins.
+- Build tool: Rsbuild with the React plugin.
 - Linting: Oxlint with browser, React, JSX a11y, correctness, suspicious, and perf rules.
 - Formatting: Oxfmt with 2 spaces, semicolons, double quotes, and 80-column wrapping.
 - Tests: Bun test.
@@ -99,7 +112,8 @@ bun run test
 - Migrated package management from Yarn to Bun and replaced `yarn.lock` with `bun.lock`.
 - Migrated Vite config/scripts to Rsbuild config/scripts.
 - Updated dependencies to Bun-resolved latest versions on July 7, 2026.
-- Replaced the Vite PWA plugin with `rsbuild-plugin-pwa` to preserve PWA build behavior.
+- Removed PWA generation; the app ships as a standard static React site and
+  unregisters service workers left by older PWA builds.
 - Added Oxc tooling config and a small Bun test around selector filtering.
 - Added persisted learning modes, sequential/shuffle ordering, reset defaults,
-  and generated offline JMdict-Simplified word practice data.
+  and generated local JMdict-Simplified word practice data.

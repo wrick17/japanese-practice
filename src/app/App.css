@@ -178,7 +178,7 @@ h3 {
 
 .utility-control {
   display: grid;
-  grid-template-columns: minmax(118px, 1fr) auto;
+  grid-template-columns: minmax(118px, 1fr) auto auto;
   gap: 8px;
   align-items: end;
 }
@@ -193,6 +193,94 @@ h3 {
   border-radius: 8px;
   background-color: transparent;
   color: rgb(255 255 255 / 0.72);
+}
+
+.shortcut-button {
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-color: rgb(103 232 249 / 0.18);
+  border-radius: 8px;
+  background-color: #161616;
+  color: #67e8f9;
+  font-weight: 800;
+}
+
+.shortcut-dialog {
+  width: min(92vw, 420px);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 8px;
+  padding: 0;
+  color: white;
+  background: #151515;
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.5);
+}
+
+.shortcut-dialog::backdrop {
+  background: rgb(0 0 0 / 0.58);
+}
+
+.shortcut-panel {
+  padding: 18px;
+}
+
+.shortcut-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.shortcut-header h2 {
+  font-size: 1.05rem;
+}
+
+.shortcut-close {
+  min-height: 34px;
+  border-color: rgb(255 255 255 / 0.12);
+  background-color: transparent;
+  color: rgb(255 255 255 / 0.78);
+}
+
+.shortcut-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.shortcut-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+  padding: 8px 0;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.shortcut-row:first-child {
+  border-top: 0;
+}
+
+.shortcut-row dt,
+.shortcut-row dd {
+  margin: 0;
+}
+
+kbd {
+  display: inline-flex;
+  min-width: 64px;
+  justify-content: center;
+  border: 1px solid rgb(103 232 249 / 0.22);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #67e8f9;
+  background: #0f0f0f;
+  font-family: inherit;
+  font-size: 0.85rem;
 }
 
 .button {
@@ -573,11 +661,12 @@ ul button {
   }
 
   .settings-panel:not(.has-prompt) .utility-control {
-    grid-column: auto;
+    grid-column: 1 / -1;
   }
 
   .utility-control {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
 
   .reset-button {

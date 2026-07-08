@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
 import classNames from "classnames";
-import { modes, speak, wordPrompts } from "../utils/utilsV2";
+import { modes, wordPrompts } from "../utils/utilsV2";
 
 const wordLabels = {
   [wordPrompts.japanese]: "Japanese",
@@ -37,10 +36,16 @@ const getWordAnswers = (item, wordPrompt) =>
       japanese: key === wordPrompts.japanese,
     }));
 
-export const ShowCase = ({ item, mode, wordPrompt }) => {
-  const [show, setShow] = useState(false);
-  const [announce, setAnnounce] = useState(false);
-  const speechText = item?.japanese;
+export const ShowCase = ({
+  item,
+  mode,
+  wordPrompt,
+  show,
+  announce,
+  onSpeak,
+  onToggleAnswer,
+  onToggleAnnounce,
+}) => {
   const prompt = item
     ? item.kind === "word"
       ? getWordPrompt(item, wordPrompt)
@@ -53,20 +58,12 @@ export const ShowCase = ({ item, mode, wordPrompt }) => {
     : [];
   const fields = prompt ? [prompt, ...answers] : [];
 
-  useEffect(() => {
-    setShow(false);
-  }, [item, mode, wordPrompt]);
-
-  useEffect(() => {
-    if (announce) speak(speechText);
-  }, [item, announce, speechText]);
-
   return (
     <div className="practice-stage">
       <button
         aria-label="Play Japanese sound"
         className="showcase"
-        onClick={() => speak(speechText)}
+        onClick={onSpeak}
         type="button"
       >
         {!item ? (
@@ -102,7 +99,7 @@ export const ShowCase = ({ item, mode, wordPrompt }) => {
       <div className="card-actions">
         <button
           className="show help"
-          onClick={() => setShow(!show)}
+          onClick={onToggleAnswer}
           disabled={!item}
           type="button"
         >
@@ -110,7 +107,7 @@ export const ShowCase = ({ item, mode, wordPrompt }) => {
         </button>
         <button
           className="show speak"
-          onClick={() => setAnnounce(!announce)}
+          onClick={onToggleAnnounce}
           disabled={!item}
           type="button"
         >
