@@ -8,6 +8,7 @@
     "build": "rsbuild build",
     "generate:words": "bun scripts/generateWords.js",
     "preview": "rsbuild preview --host 0.0.0.0",
+    "deploy": "bun run build && bunx wrangler pages deploy dist --project-name japanese-practice --branch master",
     "lint": "oxlint .",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",

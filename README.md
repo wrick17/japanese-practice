@@ -56,7 +56,28 @@ teaches, stores the first English gloss, and writes stable formatted JSON.
 - Linting: Oxlint with browser, React, JSX a11y, correctness, suspicious, and perf rules.
 - Formatting: Oxfmt with 2 spaces, semicolons, double quotes, and 80-column wrapping.
 - Tests: Bun test.
-- Deployment workflow: GitHub Pages build uses Bun.
+- Deployment target: Cloudflare Pages.
+- Deployment workflow: pushes to `master` install, format-check, lint, test,
+  build, and deploy `dist` with Bun and Wrangler when the
+  `CLOUDFLARE_API_TOKEN` GitHub secret is configured.
+
+## Cloudflare Pages
+
+- Pages project: `japanese-practice`.
+- Production branch: `master`.
+- Build command: `bun run build`.
+- Build output directory: `dist`.
+- Custom domain: `japanese.wrick17.com`.
+- DNS target: `japanese-practice-c5y.pages.dev` after the custom domain is added
+  to the Pages project.
+- Do not only add the DNS CNAME; attach the custom domain to the Pages project
+  first so Cloudflare provisions the route/certificate correctly.
+- DNS record: proxied CNAME `japanese.wrick17.com` to
+  `japanese-practice-c5y.pages.dev`.
+- GitHub Actions secret required for automatic deploys:
+  `CLOUDFLARE_API_TOKEN` with Cloudflare Pages edit access.
+- If the token secret is missing, CI still validates the app and skips only the
+  deploy step.
 
 ## Scripts
 
@@ -65,6 +86,7 @@ bun install
 bun run dev
 bun run generate:words
 bun run build
+bun run deploy
 bun run preview
 bun run lint
 bun run format:check

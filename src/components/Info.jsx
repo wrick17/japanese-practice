@@ -22,9 +22,13 @@ export const Info = () => {
         <a target="__blank" href="https://www.wrick17.com">
           Wrick
         </a>{" "}
-        and hosted on{" "}
+        with source on{" "}
         <a target="__blank" href="https://github.com/wrick17/japanese-practice">
-          Github
+          GitHub
+        </a>{" "}
+        and hosting on{" "}
+        <a target="__blank" href="https://pages.cloudflare.com/">
+          Cloudflare Pages
         </a>
         .
       </p>
