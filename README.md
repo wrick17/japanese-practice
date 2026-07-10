@@ -62,6 +62,9 @@ teaches, stores the first English gloss, and writes stable formatted JSON.
 Open the legend with the `?` button or the `?` key. Close it with `Esc`, the
 Close button, or a click outside the popup.
 
+Pointer-activated controls release focus so shortcuts resume immediately.
+Controls reached with the keyboard retain native Tab and Enter/Space behavior.
+
 - `Space`: reveal or hide the answer outside Learn mode.
 - `Enter`: move to the next card.
 - `P`: play the Japanese audio.

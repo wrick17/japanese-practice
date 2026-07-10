@@ -5,6 +5,7 @@ import { SelectorV2 } from "../components/SelectorV2";
 import { ShowCase } from "../components/ShowCase";
 import { useJapanese } from "../hooks/hooks";
 import {
+  blurPointerActivatedControl,
   getKeyboardShortcutAction,
   keyboardShortcutLegend,
   shortcutActions,
@@ -149,7 +150,8 @@ const AppV2 = () => {
   }, [item, announce, speechText]);
 
   useEffect(() => {
-    const closeDropdowns = (event) => {
+    const handleDocumentClick = (event) => {
+      blurPointerActivatedControl(event);
       document
         .querySelectorAll(".dropdown-control[open]")
         .forEach((details) => {
@@ -157,8 +159,8 @@ const AppV2 = () => {
         });
     };
 
-    document.addEventListener("click", closeDropdowns);
-    return () => document.removeEventListener("click", closeDropdowns);
+    document.addEventListener("click", handleDocumentClick);
+    return () => document.removeEventListener("click", handleDocumentClick);
   }, []);
 
   useEffect(() => {

@@ -40,6 +40,13 @@ export const keyboardShortcutLegend = Object.freeze([
 ]);
 
 const editableTags = new Set(["INPUT", "TEXTAREA", "SELECT"]);
+const interactiveSelector =
+  "button, summary, a, input, textarea, select, [role='button']";
+
+export const blurPointerActivatedControl = (event) => {
+  if (event.detail <= 0) return;
+  event.target.closest?.(interactiveSelector)?.blur();
+};
 
 export const shouldIgnoreShortcutTarget = (target) => {
   if (!target) return false;
@@ -48,11 +55,7 @@ export const shouldIgnoreShortcutTarget = (target) => {
   const tagName = target.tagName?.toUpperCase();
   if (editableTags.has(tagName)) return true;
 
-  return Boolean(
-    target.closest?.(
-      "button, summary, a, input, textarea, select, [role='button']",
-    ),
-  );
+  return Boolean(target.closest?.(interactiveSelector));
 };
 
 export const getKeyboardShortcutAction = (event) => {

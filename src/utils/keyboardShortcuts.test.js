@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 
 import {
+  blurPointerActivatedControl,
   getKeyboardShortcutAction,
   keyboardShortcutLegend,
   shortcutActions,
@@ -62,6 +63,19 @@ test("ignores shortcuts from modified and interactive events", () => {
       tagName: "input",
     }),
   ).toBe(true);
+});
+
+test("releases pointer focus but preserves keyboard-focused controls", () => {
+  let blurCount = 0;
+  const target = {
+    closest: () => ({ blur: () => blurCount++ }),
+  };
+
+  blurPointerActivatedControl({ detail: 1, target });
+  expect(blurCount).toBe(1);
+
+  blurPointerActivatedControl({ detail: 0, target });
+  expect(blurCount).toBe(1);
 });
 
 test("documents each handled shortcut in the legend", () => {
