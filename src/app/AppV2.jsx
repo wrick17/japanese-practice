@@ -1,4 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  Keyboard,
+  RotateCcw,
+  X,
+} from "lucide-react";
 import { CheatSheetV2 } from "../components/CheatSheetV2";
 import { Info } from "../components/Info";
 import { SelectorV2 } from "../components/SelectorV2";
@@ -53,9 +61,7 @@ const Dropdown = ({ label, value, options, onChange }) => {
       <details className="dropdown-control">
         <summary aria-label={`${label}: ${current?.label}`}>
           {current?.label}
-          <span aria-hidden="true" className="dropdown-chevron">
-            ▾
-          </span>
+          <ChevronDown aria-hidden="true" className="dropdown-chevron" />
         </summary>
         <div className="dropdown-menu">
           {options.map((option) => (
@@ -91,7 +97,8 @@ const ShortcutDialog = ({ dialogRef }) => (
       <div className="shortcut-header">
         <h2 id="shortcut-dialog-title">Keyboard shortcuts</h2>
         <form method="dialog">
-          <button className="shortcut-close" type="submit">
+          <button className="shortcut-close with-icon" type="submit">
+            <X aria-hidden="true" className="button-icon" />
             Close
           </button>
         </form>
@@ -116,6 +123,7 @@ const AppV2 = () => {
     setList,
     deck,
     next,
+    previous,
     currentItem,
     settings,
     updateSettings,
@@ -193,6 +201,8 @@ const AppV2 = () => {
 
       if (action === shortcutActions.toggleAnswer) {
         toggleAnswer();
+      } else if (action === shortcutActions.previousCard) {
+        previous();
       } else if (action === shortcutActions.nextCard) {
         next();
       } else if (action === shortcutActions.playSound) {
@@ -204,7 +214,7 @@ const AppV2 = () => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [item, next, openShortcuts, playSound, toggleAnswer]);
+  }, [item, next, openShortcuts, playSound, previous, toggleAnswer]);
 
   return (
     <main className="select">
@@ -280,7 +290,12 @@ const AppV2 = () => {
                   updateSettings({ shuffle: order === "shuffle" })
                 }
               />
-              <button className="reset-button" onClick={reset} type="button">
+              <button
+                className="reset-button with-icon"
+                onClick={reset}
+                type="button"
+              >
+                <RotateCcw aria-hidden="true" className="button-icon" />
                 Reset
               </button>
             </div>
@@ -304,12 +319,28 @@ const AppV2 = () => {
 
           <div className="button-group">
             <button
-              className="switch highlight"
+              className="switch with-icon"
+              onClick={previous}
+              disabled={!item}
+              type="button"
+            >
+              <ArrowLeft aria-hidden="true" className="button-icon" />
+              Previous
+              <kbd aria-hidden="true" className="shortcut-hint">
+                ←
+              </kbd>
+            </button>
+            <button
+              className="switch highlight with-icon"
               onClick={next}
               disabled={!item}
               type="button"
             >
+              <ArrowRight aria-hidden="true" className="button-icon" />
               Next
+              <kbd aria-hidden="true" className="shortcut-hint">
+                →
+              </kbd>
             </button>
             <span className="deck-count">
               {deck.length ? `${currentItem + 1} / ${deck.length}` : "0 cards"}
@@ -321,7 +352,13 @@ const AppV2 = () => {
               onClick={openShortcuts}
               type="button"
             >
-              ?
+              <Keyboard aria-hidden="true" className="button-icon" />
+              <kbd
+                aria-hidden="true"
+                className="shortcut-hint icon-shortcut-hint"
+              >
+                ?
+              </kbd>
             </button>
           </div>
         </section>

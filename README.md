@@ -44,7 +44,14 @@ local word practice.
   `shi(shee)`, and `tsu(tsoo)`; Words mode keeps dictionary romaji unchanged.
 - Prompts use the available card space and fit down; long Kanji readings and
   meanings can wrap within the card.
-- The keyboard-shortcut help button sits beside the deck count and Next button.
+- The keyboard-shortcut help button sits beside the deck count and
+  Previous/Next buttons. The navigation, reveal, and announce controls use
+  compact labels with tall mobile-friendly touch targets.
+- Every shortcut-enabled control includes a small, faint keycap hint for its
+  corresponding key without changing the control's accessible label.
+- Lucide icons consistently identify navigation, audio, answer, announce,
+  reset, reference, dialog, guide, and external-link actions without replacing
+  their accessible text labels.
 - A beginner-friendly, collapsed "How to use the platform" guide explains the
   recommended Learn -> Character to Reading -> Reading to Character flow, plus
   Words practice for kana.
@@ -57,7 +64,7 @@ local word practice.
   mode stays separate until a sourced Kanji vocabulary deck is added.
 - Settings are stored in `localStorage` under
   `japanese-practice-settings-v1`; Reset restores defaults.
-- Keyboard shortcuts are available from the `?` popup in the header.
+- Keyboard shortcuts are available from the keyboard-icon popup in the header.
 - Existing service workers from older PWA builds are unregistered on app load.
 - The timer feature was removed.
 
@@ -131,13 +138,17 @@ teaches, stores the first English gloss, and writes stable formatted JSON.
 
 ## Keyboard Shortcuts
 
-Open the legend with the `?` button or the `?` key. Close it with `Esc`, the
-Close button, or a click outside the popup.
+Open the legend with the keyboard-icon button or the `?` key. Close it with
+`Esc`, the Close button, or a click outside the popup.
 
 Pointer-activated controls release focus so shortcuts resume immediately.
-Controls reached with the keyboard retain native Tab and Enter/Space behavior.
+Left/Right remain available when a non-editable control keeps focus; editable
+controls retain their native arrow behavior. Controls reached with the keyboard
+retain native Tab and Enter/Space behavior.
 
 - `Space`: reveal or hide the answer outside Learn mode.
+- `Left Arrow`: move to the previous card.
+- `Right Arrow`: move to the next card.
 - `Enter`: move to the next card.
 - `P`: play the Japanese audio.
 - `A`: start or stop announce mode.

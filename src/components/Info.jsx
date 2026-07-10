@@ -1,8 +1,18 @@
+import { BookOpen, ChevronDown, ExternalLink, Sparkles } from "lucide-react";
+
+const ExternalIcon = () => (
+  <ExternalLink aria-hidden="true" className="external-link-icon" />
+);
+
 export const Info = () => {
   return (
     <section className="info">
       <details className="usage-guide">
-        <summary>How to use the platform</summary>
+        <summary>
+          <BookOpen aria-hidden="true" className="guide-icon" />
+          How to use the platform
+          <ChevronDown aria-hidden="true" className="guide-chevron" />
+        </summary>
         <div className="usage-guide-content">
           <p>
             For kana, start with one row such as the <strong>a row</strong>. For
@@ -35,7 +45,11 @@ export const Info = () => {
         </div>
       </details>
       <details className="usage-guide features-guide">
-        <summary>Features</summary>
+        <summary>
+          <Sparkles aria-hidden="true" className="guide-icon" />
+          Features
+          <ChevronDown aria-hidden="true" className="guide-chevron" />
+        </summary>
         <div className="usage-guide-content">
           <ul>
             <li>
@@ -59,8 +73,8 @@ export const Info = () => {
             </li>
             <li>
               <strong>Use quick study tools:</strong> Reveal answers, open the
-              chart or Kanji reference, or press the <strong>?</strong> button
-              to see keyboard shortcuts.
+              chart or Kanji reference, or press the keyboard button to see
+              keyboard shortcuts.
             </li>
             <li>
               <strong>Continue later:</strong> Your selections and settings are
@@ -73,6 +87,7 @@ export const Info = () => {
         Made by{" "}
         <a href="https://www.wrick17.com" rel="noreferrer" target="_blank">
           Wrick
+          <ExternalIcon />
         </a>{" "}
         with source on{" "}
         <a
@@ -81,6 +96,7 @@ export const Info = () => {
           target="_blank"
         >
           GitHub
+          <ExternalIcon />
         </a>{" "}
         and hosting on{" "}
         <a
@@ -89,6 +105,7 @@ export const Info = () => {
           target="_blank"
         >
           Cloudflare Pages
+          <ExternalIcon />
         </a>
         {"."}
       </p>
@@ -100,6 +117,7 @@ export const Info = () => {
           target="_blank"
         >
           KANJIDIC2
+          <ExternalIcon />
         </a>{" "}
         © EDRDG under{" "}
         <a
@@ -108,6 +126,7 @@ export const Info = () => {
           target="_blank"
         >
           CC BY-SA 4.0
+          <ExternalIcon />
         </a>
         {"; "}JLPT estimates from{" "}
         <a
@@ -116,6 +135,7 @@ export const Info = () => {
           target="_blank"
         >
           kanji-data
+          <ExternalIcon />
         </a>{" "}
         based on{" "}
         <a
@@ -124,6 +144,7 @@ export const Info = () => {
           target="_blank"
         >
           Tanos JLPT Resources
+          <ExternalIcon />
         </a>
         {"."}
       </p>

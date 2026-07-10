@@ -26,6 +26,12 @@ test("maps keyboard shortcuts to practice actions", () => {
   expect(getKeyboardShortcutAction(eventFor("Enter"))).toBe(
     shortcutActions.nextCard,
   );
+  expect(getKeyboardShortcutAction(eventFor("ArrowLeft"))).toBe(
+    shortcutActions.previousCard,
+  );
+  expect(getKeyboardShortcutAction(eventFor("ArrowRight"))).toBe(
+    shortcutActions.nextCard,
+  );
   expect(getKeyboardShortcutAction(eventFor("p"))).toBe(
     shortcutActions.playSound,
   );
@@ -57,12 +63,26 @@ test("ignores shortcuts from modified and interactive events", () => {
     getKeyboardShortcutAction(eventFor("p", { target: buttonChild })),
   ).toBeNull();
   expect(
+    getKeyboardShortcutAction(eventFor("ArrowRight", { target: buttonChild })),
+  ).toBe(shortcutActions.nextCard);
+  expect(
     shouldIgnoreShortcutTarget({
       closest: () => null,
       isContentEditable: false,
       tagName: "input",
     }),
   ).toBe(true);
+  expect(
+    getKeyboardShortcutAction(
+      eventFor("ArrowLeft", {
+        target: {
+          closest: () => null,
+          isContentEditable: false,
+          tagName: "input",
+        },
+      }),
+    ),
+  ).toBeNull();
 });
 
 test("releases pointer focus but preserves keyboard-focused controls", () => {
@@ -81,6 +101,8 @@ test("releases pointer focus but preserves keyboard-focused controls", () => {
 test("documents each handled shortcut in the legend", () => {
   expect(keyboardShortcutLegend.map((shortcut) => shortcut.key)).toEqual([
     "Space",
+    "\u2190",
+    "\u2192",
     "Enter",
     "P",
     "A",

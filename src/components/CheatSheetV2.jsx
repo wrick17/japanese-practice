@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import { BookOpen, EyeOff, Volume2, X } from "lucide-react";
 
 import { japanese } from "../constants/constantsV2";
 import { kanji } from "../constants/kanjiV1";
@@ -94,10 +95,15 @@ export const CheatSheetV2 = ({ kanaScript }) => {
     >
       <div className="cheatsheet-header">
         <button
-          className="show-cheatsheet highlight"
+          className="show-cheatsheet highlight with-icon"
           onClick={() => setShowCheatSheet(!showCheatSheet)}
           type="button"
         >
+          {showCheatSheet ? (
+            <EyeOff aria-hidden="true" className="button-icon" />
+          ) : (
+            <BookOpen aria-hidden="true" className="button-icon" />
+          )}
           {showCheatSheet ? "Hide" : "Show"}{" "}
           {kanaScript === scripts.kanji ? "Reference" : "Chart"}
         </button>
@@ -158,7 +164,12 @@ export const CheatSheetV2 = ({ kanaScript }) => {
             <h2 id="study-dialog-title">
               {kanaScript === scripts.kanji ? "Kanji" : "Kana"} details
             </h2>
-            <button onClick={() => dialogRef.current?.close()} type="button">
+            <button
+              className="with-icon"
+              onClick={() => dialogRef.current?.close()}
+              type="button"
+            >
+              <X aria-hidden="true" className="button-icon" />
               Close
             </button>
           </div>
@@ -168,6 +179,7 @@ export const CheatSheetV2 = ({ kanaScript }) => {
               onClick={() => speak(selectedItem.audio)}
               type="button"
             >
+              <Volume2 aria-hidden="true" className="card-audio-icon" />
               <span className="sr-only">
                 {selectedItem.kind === "kanji"
                   ? "Play first listed reading. "

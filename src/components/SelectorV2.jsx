@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { CheckCheck } from "lucide-react";
 
 export const SelectorV2 = ({ list, setList, stacked = false }) => {
   const onSelect = (item) => {
@@ -46,10 +47,13 @@ export const SelectorV2 = ({ list, setList, stacked = false }) => {
               <span className="selector-label">{group.label}</span>
             )}
             <button
-              className={classNames("button batch", { selected: allChecked })}
+              className={classNames("button batch with-icon", {
+                selected: allChecked,
+              })}
               onClick={() => toggleAll(group, allChecked)}
               type="button"
             >
+              <CheckCheck aria-hidden="true" className="button-icon" />
               All
             </button>
             <ul>

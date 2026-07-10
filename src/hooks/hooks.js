@@ -70,6 +70,11 @@ export const useJapanese = () => {
     });
   };
 
+  const previous = () => {
+    if (!deck.length) return;
+    setCurrentItem((index) => (index > 0 ? index - 1 : deck.length - 1));
+  };
+
   const reset = () => {
     clearSettings();
     setSettings(defaultSettings);
@@ -98,6 +103,7 @@ export const useJapanese = () => {
     setList,
     deck,
     next,
+    previous,
     currentItem,
     settings,
     updateSettings,

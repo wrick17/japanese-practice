@@ -1,5 +1,13 @@
 import { useLayoutEffect, useRef } from "react";
 import classNames from "classnames";
+import {
+  CircleCheck,
+  Eye,
+  EyeOff,
+  Megaphone,
+  MegaphoneOff,
+  Volume2,
+} from "lucide-react";
 import { fitText } from "../utils/fitText";
 import { getKanaRomajiDisplay, modes, wordPrompts } from "../utils/utilsV2";
 
@@ -188,6 +196,8 @@ export const ShowCase = ({
   onToggleAnnounce,
 }) => {
   const { prompt, fields } = getStudyFields(item, mode, wordPrompt);
+  const AnswerIcon = answerLocked ? CircleCheck : show ? EyeOff : Eye;
+  const AnnounceIcon = announce ? MegaphoneOff : Megaphone;
 
   return (
     <div className="practice-stage">
@@ -198,11 +208,17 @@ export const ShowCase = ({
         type="button"
       >
         {item && (
-          <span className="sr-only">
-            {item.kind === "kanji"
-              ? "Play first listed reading. "
-              : "Play Japanese sound. "}
-          </span>
+          <>
+            <span className="sr-only">
+              {item.kind === "kanji"
+                ? "Play first listed reading. "
+                : "Play Japanese sound. "}
+            </span>
+            <span aria-hidden="true" className="card-audio-control">
+              <Volume2 className="button-icon" />
+              <kbd className="shortcut-hint">P</kbd>
+            </span>
+          </>
         )}
         {!item ? (
           <span className="block empty-state">Pick a study group to start</span>
@@ -223,24 +239,32 @@ export const ShowCase = ({
       </button>
       <div className="card-actions">
         <button
-          className="show help"
+          className="show help with-icon"
           onClick={onToggleAnswer}
           disabled={!item || answerLocked}
           type="button"
         >
+          <AnswerIcon aria-hidden="true" className="button-icon" />
           {answerLocked
             ? "Answer Revealed"
             : show
               ? "Hide Answer"
               : "Reveal Answer"}
+          <kbd aria-hidden="true" className="shortcut-hint">
+            Space
+          </kbd>
         </button>
         <button
-          className="show speak"
+          className="show speak with-icon"
           onClick={onToggleAnnounce}
           disabled={!item}
           type="button"
         >
+          <AnnounceIcon aria-hidden="true" className="button-icon" />
           {announce ? "Stop Announce" : "Announce"}
+          <kbd aria-hidden="true" className="shortcut-hint">
+            A
+          </kbd>
         </button>
       </div>
     </div>
