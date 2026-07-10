@@ -284,6 +284,17 @@ test("defaults word prompts to romaji", () => {
   expect(loadSettings(createStorage()).wordPrompt).toBe(wordPrompts.romaji);
 });
 
+test("uses the beginner mode order and defaults to learn", () => {
+  expect(Object.values(modes)).toEqual([
+    modes.learn,
+    modes.kanaToRomaji,
+    modes.romajiToKana,
+    modes.words,
+  ]);
+  expect(defaultSettings.mode).toBe(modes.learn);
+  expect(loadSettings(createStorage()).mode).toBe(modes.learn);
+});
+
 test("returns no cards when no rows are selected", () => {
   const deck = getDeck({
     list: getInitialList([]),

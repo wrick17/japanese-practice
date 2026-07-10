@@ -48,10 +48,18 @@ const getWordAnswers = (item, wordPrompt) =>
       japanese: key === wordPrompts.japanese,
     }));
 
-const FittedAnswer = ({ field, fieldCount }) => {
+const FittedAnswer = ({ field, fieldCount, prompt = false }) => {
   const containerRef = useRef(null);
   const textRef = useRef(null);
-  const maxFontSize = field.japanese ? 160 : fieldCount === 2 ? 80 : 56;
+  const maxFontSize = prompt
+    ? field.japanese
+      ? 180
+      : 120
+    : field.japanese
+      ? 160
+      : fieldCount === 2
+        ? 80
+        : 56;
 
   useLayoutEffect(() => {
     const container = containerRef.current;
@@ -70,6 +78,7 @@ const FittedAnswer = ({ field, fieldCount }) => {
     <span
       className={classNames("answer-value", {
         japanese: field.japanese,
+        "prompt-value": prompt,
       })}
       ref={containerRef}
     >
@@ -135,7 +144,7 @@ export const ShowCase = ({
               english: prompt.label === "English",
             })}
           >
-            <span>{prompt.value}</span>
+            <FittedAnswer field={prompt} fieldCount={1} prompt />
             <span className="small-subtext">{prompt.label}</span>
           </span>
         )}

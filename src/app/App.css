@@ -176,9 +176,13 @@ h3 {
   min-width: 0;
 }
 
+.secondary-controls {
+  display: contents;
+}
+
 .utility-control {
   display: grid;
-  grid-template-columns: minmax(118px, 1fr) auto auto;
+  grid-template-columns: minmax(118px, 1fr) auto;
   gap: 8px;
   align-items: end;
 }
@@ -196,6 +200,7 @@ h3 {
 }
 
 .shortcut-button {
+  flex: 0 0 40px;
   width: 40px;
   min-height: 40px;
   padding: 0;
@@ -413,11 +418,21 @@ kbd {
   overflow: hidden;
 }
 
+.prompt-value {
+  width: 100%;
+  min-height: 0;
+  justify-content: center;
+}
+
+.prompt-value .answer-text {
+  text-align: center;
+}
+
 .answer-text {
   width: 100%;
   font-size: 1rem;
   line-height: 1.05;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
   text-align: right;
 }
 
@@ -556,7 +571,50 @@ kbd {
   padding: 16px;
 }
 
-.info p {
+.usage-guide {
+  max-width: 720px;
+  margin: 0 auto;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  border-radius: 8px;
+  background: rgb(0 0 0 / 0.18);
+  text-align: left;
+}
+
+.usage-guide summary {
+  padding: 14px 16px;
+  color: white;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.usage-guide-content {
+  padding: 0 16px 16px;
+}
+
+.usage-guide-content p {
+  margin: 0;
+}
+
+.usage-guide-content ol {
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.usage-guide-content ul {
+  margin: 0;
+  padding-left: 24px;
+}
+
+.usage-guide-content li + li {
+  margin-top: 8px;
+}
+
+.features-guide {
+  margin-top: 10px;
+}
+
+.credits {
   max-width: 720px;
   margin: 12px auto 0;
 }
@@ -580,7 +638,7 @@ kbd {
   padding: 4px;
 }
 
-ul {
+.selector-group ul {
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -593,7 +651,7 @@ ul {
   padding: 0;
 }
 
-li {
+.selector-group li {
   display: flex;
   align-items: center;
   margin: 4px;
@@ -602,7 +660,7 @@ li {
   width: 40px;
 }
 
-ul button {
+.selector-group ul button {
   padding: 4px;
   height: 40px;
   width: 100%;
@@ -665,7 +723,7 @@ ul button {
   }
 
   .settings-panel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(112px, 1fr) minmax(0, 2fr);
   }
 
   .settings-panel:not(.has-prompt) .utility-control {
@@ -674,7 +732,19 @@ ul button {
 
   .utility-control {
     grid-column: 1 / -1;
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .settings-panel.has-prompt .secondary-controls {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: end;
+  }
+
+  .settings-panel.has-prompt .utility-control {
+    display: contents;
   }
 
   .reset-button {

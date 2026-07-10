@@ -14,9 +14,9 @@ const kanaVowelSounds = {
 export const STORAGE_KEY = "japanese-practice-settings-v1";
 
 export const modes = {
-  romajiToKana: "romaji-to-kana",
-  kanaToRomaji: "kana-to-romaji",
   learn: "learn",
+  kanaToRomaji: "kana-to-romaji",
+  romajiToKana: "romaji-to-kana",
   words: "words",
 };
 
@@ -32,7 +32,7 @@ export const wordPrompts = {
 };
 
 export const defaultSettings = {
-  mode: modes.romajiToKana,
+  mode: modes.learn,
   kanaScript: scripts.hiragana,
   shuffle: false,
   wordPrompt: wordPrompts.romaji,

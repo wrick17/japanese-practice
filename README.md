@@ -9,22 +9,31 @@ and local word practice.
 - Kanji is not implemented yet; keep new learning data shaped so another script
   can be added later.
 - Study modes:
-  - Romaji to Japanese character.
-  - Japanese character to romaji self-check.
   - Learn, with answers always revealed and the answer control locked.
+  - Japanese character to romaji self-check.
+  - Romaji to Japanese character.
   - Words, with a selectable Japanese, romaji, or English prompt.
 - The header uses a compact `あ Learning` wordmark and dropdown controls for
   script, mode, prompt, and deck order.
 - Wider viewports use a two-column study layout; mobile keeps the compact
-  single-column flow, with the kana chart groups and study notes below the main
-  practice/study sections.
+  single-column flow, uses a minimum-width Script column with roughly twice the
+  flexible space for Mode, and keeps Words prompt, order, and Reset controls on
+  one row.
 - The practice card keeps a stable size when answers are revealed, its action
-  labels stay on one line, revealed values grow to fill their available row
-  without clipping, Japanese stays visually largest, and romaji/English use
-  smaller caps. Announce mode does not hide a revealed answer.
+  labels stay on one line, revealed values grow to fill their available row and
+  fit down to one line without clipping, Japanese stays visually largest, and
+  romaji/English use smaller caps. Announce mode does not hide a revealed
+  answer.
 - Kana cards keep standard romaji beside a pronunciation cue, such as `a(aa)`,
   `shi(shee)`, and `tsu(tsoo)`; Words mode keeps dictionary romaji unchanged.
-- Defaults: Hiragana, vowel row, sequential order, Romaji to Japanese mode, and
+- Prompts use the available card space and fit down to keep longer text on one
+  line.
+- The keyboard-shortcut help button sits beside the deck count and Next button.
+- A beginner-friendly, collapsed "How to use the platform" guide explains the
+  recommended Learn -> Japanese to Romaji -> Romaji to Japanese -> Words flow.
+- A collapsed Features guide explains card audio, announce mode, row-aware word
+  practice, deck controls, study tools, shortcuts, and saved settings.
+- Defaults: Hiragana, vowel row, sequential order, Learn mode, and
   Romaji prompt for Words mode.
 - The shuffle toggle applies to character decks; word decks always shuffle.
 - Settings are stored in `localStorage` under

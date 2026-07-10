@@ -242,38 +242,33 @@ const AppV2 = () => {
               }
             />
           </div>
-          {settings.mode === modes.words && (
-            <Dropdown
-              label="Prompt"
-              value={settings.wordPrompt}
-              options={Object.values(wordPrompts).map((wordPrompt) => ({
-                label: wordPromptLabels[wordPrompt],
-                value: wordPrompt,
-              }))}
-              onChange={(wordPrompt) => updateSettings({ wordPrompt })}
-            />
-          )}
-          <div className="utility-control">
-            <Dropdown
-              label="Order"
-              value={isWordsMode || settings.shuffle ? "shuffle" : "sequential"}
-              options={isWordsMode ? orderOptions.slice(1) : orderOptions}
-              onChange={(order) =>
-                updateSettings({ shuffle: order === "shuffle" })
-              }
-            />
-            <button className="reset-button" onClick={reset} type="button">
-              Reset
-            </button>
-            <button
-              aria-haspopup="dialog"
-              aria-label="Keyboard shortcuts"
-              className="shortcut-button"
-              onClick={openShortcuts}
-              type="button"
-            >
-              ?
-            </button>
+          <div className="secondary-controls">
+            {settings.mode === modes.words && (
+              <Dropdown
+                label="Prompt"
+                value={settings.wordPrompt}
+                options={Object.values(wordPrompts).map((wordPrompt) => ({
+                  label: wordPromptLabels[wordPrompt],
+                  value: wordPrompt,
+                }))}
+                onChange={(wordPrompt) => updateSettings({ wordPrompt })}
+              />
+            )}
+            <div className="utility-control">
+              <Dropdown
+                label="Order"
+                value={
+                  isWordsMode || settings.shuffle ? "shuffle" : "sequential"
+                }
+                options={isWordsMode ? orderOptions.slice(1) : orderOptions}
+                onChange={(order) =>
+                  updateSettings({ shuffle: order === "shuffle" })
+                }
+              />
+              <button className="reset-button" onClick={reset} type="button">
+                Reset
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -304,6 +299,15 @@ const AppV2 = () => {
             <span className="deck-count">
               {deck.length ? `${currentItem + 1} / ${deck.length}` : "0 cards"}
             </span>
+            <button
+              aria-haspopup="dialog"
+              aria-label="Keyboard shortcuts"
+              className="shortcut-button"
+              onClick={openShortcuts}
+              type="button"
+            >
+              ?
+            </button>
           </div>
         </section>
 
