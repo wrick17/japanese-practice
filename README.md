@@ -11,14 +11,19 @@ and local word practice.
 - Study modes:
   - Romaji to Japanese character.
   - Japanese character to romaji self-check.
+  - Learn, with answers always revealed and the answer control locked.
   - Words, with a selectable Japanese, romaji, or English prompt.
 - The header uses a compact `あ Learning` wordmark and dropdown controls for
   script, mode, prompt, and deck order.
 - Wider viewports use a two-column study layout; mobile keeps the compact
   single-column flow, with the kana chart groups and study notes below the main
   practice/study sections.
-- The practice card keeps a stable size when answers are revealed, and announce
-  mode does not hide a revealed answer.
+- The practice card keeps a stable size when answers are revealed, its action
+  labels stay on one line, revealed values grow to fill their available row
+  without clipping, Japanese stays visually largest, and romaji/English use
+  smaller caps. Announce mode does not hide a revealed answer.
+- Kana cards keep standard romaji beside a pronunciation cue, such as `a(aa)`,
+  `shi(shee)`, and `tsu(tsoo)`; Words mode keeps dictionary romaji unchanged.
 - Defaults: Hiragana, vowel row, sequential order, Romaji to Japanese mode, and
   Romaji prompt for Words mode.
 - The shuffle toggle applies to character decks; word decks always shuffle.
@@ -57,7 +62,7 @@ teaches, stores the first English gloss, and writes stable formatted JSON.
 Open the legend with the `?` button or the `?` key. Close it with `Esc`, the
 Close button, or a click outside the popup.
 
-- `Space`: reveal or hide the answer.
+- `Space`: reveal or hide the answer outside Learn mode.
 - `Enter`: move to the next card.
 - `P`: play the Japanese audio.
 - `A`: start or stop announce mode.

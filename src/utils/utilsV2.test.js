@@ -6,6 +6,7 @@ import {
   defaultSettings,
   getDeck,
   getInitialList,
+  getKanaRomajiDisplay,
   loadSettings,
   modes,
   saveSettings,
@@ -204,6 +205,48 @@ test("uses sequential kana order when shuffle is off", () => {
   expect(deck.map((item) => item.roumaji)).toEqual(["a", "i", "u", "e", "o"]);
 });
 
+test("learn mode supports multiple selected rows", () => {
+  const deck = getDeck({
+    list: getInitialList(["gojuuon:a", "gojuuon:k"]),
+    mode: modes.learn,
+    kanaScript: scripts.hiragana,
+    shuffle: false,
+  });
+
+  expect(deck.map((item) => item.roumaji)).toEqual([
+    "a",
+    "i",
+    "u",
+    "e",
+    "o",
+    "ka",
+    "ki",
+    "ku",
+    "ke",
+    "ko",
+  ]);
+});
+
+test("keeps kana romaji beside its pronunciation cue", () => {
+  expect(
+    ["a", "i", "u", "e", "o", "ka", "shi", "tsu", "kya", "wo", "n"].map(
+      getKanaRomajiDisplay,
+    ),
+  ).toEqual([
+    "a(aa)",
+    "i(ee)",
+    "u(oo)",
+    "e(eh)",
+    "o(oh)",
+    "ka(kaa)",
+    "shi(shee)",
+    "tsu(tsoo)",
+    "kya(kyaa)",
+    "wo(oh)",
+    "n",
+  ]);
+});
+
 test("leaves input untouched when shuffling", () => {
   const input = ["a", "i", "u", "e", "o"];
   const output = shuffle(input);
@@ -255,7 +298,7 @@ test("returns no cards when no rows are selected", () => {
 test("loads, saves, and clears local settings", () => {
   const storage = createStorage();
   const settings = {
-    mode: modes.words,
+    mode: modes.learn,
     kanaScript: scripts.katakana,
     shuffle: true,
     selectedRows: ["gojuuon:a", "missing"],
@@ -264,7 +307,7 @@ test("loads, saves, and clears local settings", () => {
   saveSettings(settings, storage);
   expect(loadSettings(storage)).toEqual({
     ...defaultSettings,
-    mode: modes.words,
+    mode: modes.learn,
     kanaScript: scripts.katakana,
     shuffle: true,
     selectedRows: ["gojuuon:a"],

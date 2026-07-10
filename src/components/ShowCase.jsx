@@ -1,5 +1,7 @@
+import { useLayoutEffect, useRef } from "react";
 import classNames from "classnames";
-import { modes, wordPrompts } from "../utils/utilsV2";
+import { fitText } from "../utils/fitText";
+import { getKanaRomajiDisplay, modes, wordPrompts } from "../utils/utilsV2";
 
 const wordLabels = {
   [wordPrompts.japanese]: "Japanese",
@@ -11,12 +13,22 @@ const getKanaPrompt = (item, mode) => {
   if (mode === modes.kanaToRomaji) {
     return { label: "Japanese", value: item.japanese, japanese: true };
   }
-  return { label: "Romaji", value: item.roumaji, japanese: false };
+  return {
+    label: "Romaji",
+    value: getKanaRomajiDisplay(item.roumaji),
+    japanese: false,
+  };
 };
 
 const getKanaAnswers = (item, mode) => {
   if (mode === modes.kanaToRomaji) {
-    return [{ label: "Romaji", value: item.roumaji, japanese: false }];
+    return [
+      {
+        label: "Romaji",
+        value: getKanaRomajiDisplay(item.roumaji),
+        japanese: false,
+      },
+    ];
   }
   return [{ label: "Japanese", value: item.japanese, japanese: true }];
 };
@@ -36,7 +48,40 @@ const getWordAnswers = (item, wordPrompt) =>
       japanese: key === wordPrompts.japanese,
     }));
 
+const FittedAnswer = ({ field, fieldCount }) => {
+  const containerRef = useRef(null);
+  const textRef = useRef(null);
+  const maxFontSize = field.japanese ? 160 : fieldCount === 2 ? 80 : 56;
+
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const text = textRef.current;
+    if (!container || !text) return;
+
+    const fit = () => fitText(container, text, maxFontSize);
+    fit();
+
+    const observer = new ResizeObserver(fit);
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [field.value, maxFontSize]);
+
+  return (
+    <span
+      className={classNames("answer-value", {
+        japanese: field.japanese,
+      })}
+      ref={containerRef}
+    >
+      <span className="answer-text" ref={textRef}>
+        {field.value}
+      </span>
+    </span>
+  );
+};
+
 export const ShowCase = ({
+  answerLocked,
   item,
   mode,
   wordPrompt,
@@ -71,15 +116,14 @@ export const ShowCase = ({
         ) : show ? (
           <span className="block answer-card">
             {fields.map((field) => (
-              <span className="answer-line" key={field.label}>
+              <span
+                className={classNames("answer-line", {
+                  japanese: field.japanese,
+                })}
+                key={field.label}
+              >
                 <span className="answer-label">{field.label}</span>
-                <span
-                  className={classNames("answer-value", {
-                    japanese: field.japanese,
-                  })}
-                >
-                  {field.value}
-                </span>
+                <FittedAnswer field={field} fieldCount={fields.length} />
               </span>
             ))}
           </span>
@@ -100,10 +144,14 @@ export const ShowCase = ({
         <button
           className="show help"
           onClick={onToggleAnswer}
-          disabled={!item}
+          disabled={!item || answerLocked}
           type="button"
         >
-          {show ? "Hide Answer" : "Reveal Answer"}
+          {answerLocked
+            ? "Answer Revealed"
+            : show
+              ? "Hide Answer"
+              : "Reveal Answer"}
         </button>
         <button
           className="show speak"

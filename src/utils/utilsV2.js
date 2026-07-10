@@ -3,11 +3,20 @@ import { japanese } from "../constants/constantsV2";
 
 const lang = "ja-JP";
 
+const kanaVowelSounds = {
+  a: "aa",
+  i: "ee",
+  u: "oo",
+  e: "eh",
+  o: "oh",
+};
+
 export const STORAGE_KEY = "japanese-practice-settings-v1";
 
 export const modes = {
   romajiToKana: "romaji-to-kana",
   kanaToRomaji: "kana-to-romaji",
+  learn: "learn",
   words: "words",
 };
 
@@ -28,6 +37,19 @@ export const defaultSettings = {
   shuffle: false,
   wordPrompt: wordPrompts.romaji,
   selectedRows: ["gojuuon:a"],
+};
+
+const getKanaSound = (romaji) => {
+  if (romaji === "wo") return "oh";
+
+  const vowel = romaji.at(-1);
+  const sound = kanaVowelSounds[vowel];
+  return sound ? `${romaji.slice(0, -1)}${sound}` : romaji;
+};
+
+export const getKanaRomajiDisplay = (romaji) => {
+  const sound = getKanaSound(romaji);
+  return sound === romaji ? romaji : `${romaji}(${sound})`;
 };
 
 const kanaMap = {

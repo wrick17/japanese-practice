@@ -10,7 +10,7 @@ export const keyboardShortcutLegend = Object.freeze([
   {
     key: "Space",
     action: shortcutActions.toggleAnswer,
-    description: "Reveal or hide the answer.",
+    description: "Reveal or hide the answer outside Learn mode.",
   },
   {
     key: "Enter",

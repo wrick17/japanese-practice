@@ -17,6 +17,7 @@ import "./App.css";
 const modeLabels = {
   [modes.romajiToKana]: "Romaji to Japanese",
   [modes.kanaToRomaji]: "Japanese to Romaji",
+  [modes.learn]: "Learn",
   [modes.words]: "Words",
 };
 
@@ -123,7 +124,9 @@ const AppV2 = () => {
   const [announce, setAnnounce] = useState(false);
   const shortcutsDialogRef = useRef(null);
   const item = deck[currentItem];
+  const isLearnMode = settings.mode === modes.learn;
   const isWordsMode = settings.mode === modes.words;
+  const answerIsVisible = isLearnMode || showAnswer;
   const speechText = item?.japanese;
 
   const openShortcuts = useCallback(() => {
@@ -132,6 +135,10 @@ const AppV2 = () => {
   }, []);
 
   const playSound = useCallback(() => speak(speechText), [speechText]);
+
+  const toggleAnswer = useCallback(() => {
+    if (!isLearnMode) setShowAnswer((current) => !current);
+  }, [isLearnMode]);
 
   useEffect(() => {
     setShowAnswer(false);
@@ -182,7 +189,7 @@ const AppV2 = () => {
       event.preventDefault();
 
       if (action === shortcutActions.toggleAnswer) {
-        setShowAnswer((current) => !current);
+        toggleAnswer();
       } else if (action === shortcutActions.nextCard) {
         next();
       } else if (action === shortcutActions.playSound) {
@@ -194,7 +201,7 @@ const AppV2 = () => {
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [item, next, openShortcuts, playSound]);
+  }, [item, next, openShortcuts, playSound, toggleAnswer]);
 
   return (
     <main className="select">
@@ -272,13 +279,14 @@ const AppV2 = () => {
       <div className="learning-layout">
         <section className="practice-column" aria-label="Practice card">
           <ShowCase
+            answerLocked={isLearnMode}
             item={item}
             mode={settings.mode}
             announce={announce}
             onSpeak={playSound}
             onToggleAnnounce={() => setAnnounce((current) => !current)}
-            onToggleAnswer={() => setShowAnswer((current) => !current)}
-            show={showAnswer}
+            onToggleAnswer={toggleAnswer}
+            show={answerIsVisible}
             wordPrompt={settings.wordPrompt}
           />
 

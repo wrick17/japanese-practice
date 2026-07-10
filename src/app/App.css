@@ -372,7 +372,6 @@ kbd {
 
 .answer-card {
   align-items: stretch;
-  justify-content: center;
   flex-direction: column;
   gap: 8px;
   font-size: 1rem;
@@ -382,16 +381,20 @@ kbd {
 .answer-line {
   display: flex;
   min-width: 0;
-  flex: 0 1 auto;
+  min-height: 0;
+  flex: 1 1 0;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  min-height: 56px;
   border: 1px solid rgb(255 255 255 / 0.08);
   border-radius: 8px;
   padding: 8px 14px;
   background: rgb(255 255 255 / 0.035);
+}
+
+.answer-line.japanese {
+  flex-grow: 1.35;
 }
 
 .answer-label {
@@ -401,16 +404,21 @@ kbd {
 }
 
 .answer-value {
+  align-self: stretch;
+  display: flex;
+  min-width: 0;
   flex: 1;
-  max-width: 100%;
-  font-size: clamp(1.15rem, 4vw, 2rem);
-  line-height: 1.15;
-  overflow-wrap: anywhere;
-  text-align: right;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
 }
 
-.answer-value.japanese {
-  font-size: clamp(2rem, 7vw, 3.8rem);
+.answer-text {
+  width: 100%;
+  font-size: 1rem;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .empty-state {
@@ -443,7 +451,7 @@ kbd {
 
 .card-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 160px));
+  grid-template-columns: repeat(2, minmax(max-content, 1fr));
   gap: 8px;
   justify-content: center;
   width: min(100%, 460px);
@@ -690,9 +698,5 @@ ul button {
 
   .selector-group-item {
     align-items: flex-start;
-  }
-
-  .card-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
