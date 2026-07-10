@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "rsbuild dev --host 0.0.0.0",
     "build": "rsbuild build",
+    "generate:kanji": "bun scripts/generateKanji.js",
     "generate:words": "bun scripts/generateWords.js",
     "preview": "rsbuild preview --host 0.0.0.0",
     "deploy": "bun run build && bunx wrangler pages deploy dist --project-name japanese-practice --branch master",

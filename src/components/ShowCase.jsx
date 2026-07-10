@@ -33,6 +33,55 @@ const getKanaAnswers = (item, mode) => {
   return [{ label: "Japanese", value: item.japanese, japanese: true }];
 };
 
+const getKanjiReadings = (item) =>
+  [
+    item.on.length ? `音 ${item.on.join("・")}` : "",
+    item.kun.length ? `訓 ${item.kun.join("・")}` : "",
+  ]
+    .filter(Boolean)
+    .join(" / ");
+
+const getKanjiMeaning = (item) => item.meanings.join(", ");
+
+const getKanjiPrompt = (item, mode) => {
+  if (mode === modes.romajiToKana) {
+    return {
+      label: "Readings · Meaning",
+      value: `${getKanjiReadings(item)} · ${getKanjiMeaning(item)}`,
+      japanese: false,
+      multiline: true,
+    };
+  }
+  return { label: "Kanji", value: item.japanese, japanese: true };
+};
+
+const getKanjiAnswers = (item, mode) => {
+  const meaning = {
+    label: "Meaning",
+    value: getKanjiMeaning(item),
+    japanese: false,
+    multiline: true,
+  };
+  if (mode === modes.romajiToKana) {
+    return [{ label: "Kanji", value: item.japanese, japanese: true }];
+  }
+  return [
+    item.on.length && {
+      label: "On-yomi",
+      value: item.on.join("・"),
+      japanese: true,
+      multiline: true,
+    },
+    item.kun.length && {
+      label: "Kun-yomi",
+      value: item.kun.join("・"),
+      japanese: true,
+      multiline: true,
+    },
+    meaning,
+  ].filter(Boolean);
+};
+
 const getWordPrompt = (item, wordPrompt) => ({
   label: wordLabels[wordPrompt],
   value: item[wordPrompt],
@@ -82,12 +131,50 @@ const FittedAnswer = ({ field, fieldCount, prompt = false }) => {
       })}
       ref={containerRef}
     >
-      <span className="answer-text" ref={textRef}>
+      <span
+        className={classNames("answer-text", { multiline: field.multiline })}
+        ref={textRef}
+      >
         {field.value}
       </span>
     </span>
   );
 };
+
+export const getStudyFields = (item, mode, wordPrompt) => {
+  if (!item) return { prompt: null, fields: [] };
+
+  const prompt =
+    item.kind === "word"
+      ? getWordPrompt(item, wordPrompt)
+      : item.kind === "kanji"
+        ? getKanjiPrompt(item, mode)
+        : getKanaPrompt(item, mode);
+  const answers =
+    item.kind === "word"
+      ? getWordAnswers(item, wordPrompt)
+      : item.kind === "kanji"
+        ? getKanjiAnswers(item, mode)
+        : getKanaAnswers(item, mode);
+
+  return { prompt, fields: [prompt, ...answers] };
+};
+
+export const RevealedCard = ({ fields }) => (
+  <span className="block answer-card">
+    {fields.map((field) => (
+      <span
+        className={classNames("answer-line", {
+          japanese: field.japanese,
+        })}
+        key={field.label}
+      >
+        <span className="answer-label">{field.label}</span>
+        <FittedAnswer field={field} fieldCount={fields.length} />
+      </span>
+    ))}
+  </span>
+);
 
 export const ShowCase = ({
   answerLocked,
@@ -100,42 +187,27 @@ export const ShowCase = ({
   onToggleAnswer,
   onToggleAnnounce,
 }) => {
-  const prompt = item
-    ? item.kind === "word"
-      ? getWordPrompt(item, wordPrompt)
-      : getKanaPrompt(item, mode)
-    : null;
-  const answers = item
-    ? item.kind === "word"
-      ? getWordAnswers(item, wordPrompt)
-      : getKanaAnswers(item, mode)
-    : [];
-  const fields = prompt ? [prompt, ...answers] : [];
+  const { prompt, fields } = getStudyFields(item, mode, wordPrompt);
 
   return (
     <div className="practice-stage">
       <button
-        aria-label="Play Japanese sound"
         className="showcase"
+        disabled={!item}
         onClick={onSpeak}
         type="button"
       >
-        {!item ? (
-          <span className="block empty-state">Pick rows to start</span>
-        ) : show ? (
-          <span className="block answer-card">
-            {fields.map((field) => (
-              <span
-                className={classNames("answer-line", {
-                  japanese: field.japanese,
-                })}
-                key={field.label}
-              >
-                <span className="answer-label">{field.label}</span>
-                <FittedAnswer field={field} fieldCount={fields.length} />
-              </span>
-            ))}
+        {item && (
+          <span className="sr-only">
+            {item.kind === "kanji"
+              ? "Play first listed reading. "
+              : "Play Japanese sound. "}
           </span>
+        )}
+        {!item ? (
+          <span className="block empty-state">Pick a study group to start</span>
+        ) : show ? (
+          <RevealedCard fields={fields} />
         ) : (
           <span
             className={classNames("block", {

@@ -225,6 +225,50 @@ h3 {
   background: rgb(0 0 0 / 0.58);
 }
 
+.study-dialog {
+  width: min(92vw, 500px);
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 8px;
+  padding: 0;
+  color: white;
+  background: #151515;
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.5);
+}
+
+.study-dialog::backdrop {
+  background: rgb(0 0 0 / 0.58);
+}
+
+.study-dialog-panel {
+  padding: 18px;
+}
+
+.study-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.study-dialog-header h2 {
+  font-size: 1.05rem;
+}
+
+.study-dialog-card {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  background: transparent;
+}
+
+.study-dialog-card .block {
+  width: 100%;
+  cursor: pointer;
+}
+
 .shortcut-panel {
   padding: 18px;
 }
@@ -436,6 +480,11 @@ kbd {
   text-align: right;
 }
 
+.answer-text.multiline {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 .empty-state {
   font-size: 1.4rem;
 }
@@ -516,6 +565,10 @@ kbd {
   align-items: start;
 }
 
+.cheatsheet-grid.kanji-rows {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .cheatsheet-table {
   display: flex;
   width: 100%;
@@ -536,6 +589,10 @@ kbd {
   flex: 0 0 76px;
 }
 
+.row.kanji {
+  flex-wrap: wrap;
+}
+
 .item {
   display: flex;
   font-size: 18px;
@@ -549,6 +606,11 @@ kbd {
   padding: 4px 6px;
   border-radius: 8px;
   flex-direction: column;
+}
+
+.row:not(.wide):not(.kanji) .item {
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .empty {
@@ -636,6 +698,45 @@ kbd {
   border-radius: 8px;
   margin-bottom: 8px;
   padding: 4px;
+}
+
+.selector-label {
+  display: flex;
+  flex: 0 0 72px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  color: rgb(255 255 255 / 0.62);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.selector-group-item.stacked {
+  display: grid;
+  grid-template-areas:
+    "label label"
+    "all options";
+  grid-template-columns: auto 1fr;
+  gap: 4px 8px;
+}
+
+.selector-group-item.stacked .selector-label {
+  grid-area: label;
+  justify-content: flex-start;
+  padding: 4px 8px;
+}
+
+.selector-group-item.stacked .batch {
+  grid-area: all;
+  margin-right: 0;
+}
+
+.selector-group-item.stacked ul {
+  grid-area: options;
+  width: 100%;
+  margin: 0;
 }
 
 .selector-group ul {

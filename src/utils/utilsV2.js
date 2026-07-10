@@ -1,5 +1,6 @@
 import wordsData from "../constants/wordsV2.json";
 import { japanese } from "../constants/constantsV2";
+import { kanji } from "../constants/kanjiV1";
 
 const lang = "ja-JP";
 
@@ -23,6 +24,7 @@ export const modes = {
 export const scripts = {
   hiragana: "hiragana",
   katakana: "katakana",
+  kanji: "kanji",
 };
 
 export const wordPrompts = {
@@ -37,6 +39,7 @@ export const defaultSettings = {
   shuffle: false,
   wordPrompt: wordPrompts.romaji,
   selectedRows: ["gojuuon:a"],
+  selectedKanji: ["kanji:n5"],
 };
 
 const getKanaSound = (romaji) => {
@@ -68,8 +71,12 @@ export const speak = (input) => {
   utterance.lang = lang;
   utterance.rate = 0.3;
   utterance.volume = 1;
+  synth.cancel();
   synth.speak(utterance);
 };
+
+export const getKanjiAudio = (item) =>
+  (item.on[0] ?? item.kun[0]).replace(/[.-]/g, "");
 
 export const shuffle = (array) => {
   const copy = [...array];
@@ -88,7 +95,7 @@ const getRowValue = (group, row) => {
 
 const getRowId = (group, row) => `${group.group}:${getRowValue(group, row)}`;
 
-const rowDefinitions = japanese.flatMap((group) =>
+const kanaRowDefinitions = japanese.flatMap((group) =>
   group.rows.map((row) => ({
     id: getRowId(group, row),
     value: getRowValue(group, row),
@@ -97,18 +104,24 @@ const rowDefinitions = japanese.flatMap((group) =>
   })),
 );
 
-const rowIds = new Set(rowDefinitions.map((row) => row.id));
+const kanjiDefinitions = kanji.map((group) => ({
+  id: `kanji:${group.group}`,
+  group,
+}));
+
+const rowIds = new Set(kanaRowDefinitions.map((row) => row.id));
+const kanjiIds = new Set(kanjiDefinitions.map((item) => item.id));
 const modeValues = new Set(Object.values(modes));
 const scriptValues = new Set(Object.values(scripts));
 const wordPromptValues = new Set(Object.values(wordPrompts));
 
 const unitsByScript = {
-  [scripts.hiragana]: rowDefinitions
+  [scripts.hiragana]: kanaRowDefinitions
     .flatMap(({ row }) =>
       row.filter((item) => item.roumaji).map((item) => item.kana),
     )
     .toSorted((a, b) => b.length - a.length),
-  [scripts.katakana]: rowDefinitions
+  [scripts.katakana]: kanaRowDefinitions
     .flatMap(({ row }) =>
       row.filter((item) => item.roumaji).map((item) => item.kanaK),
     )
@@ -123,12 +136,27 @@ export const normalizeSettings = (settings = {}) => {
   const selectedRows = hasSelectedRows
     ? settings.selectedRows.filter((row) => rowIds.has(row))
     : defaultSettings.selectedRows;
+  const hasSelectedKanji = Array.isArray(settings.selectedKanji);
+  const selectedKanji = hasSelectedKanji
+    ? settings.selectedKanji.filter((item) => kanjiIds.has(item))
+    : defaultSettings.selectedKanji;
+  const migratedKanji =
+    hasSelectedKanji &&
+    !selectedKanji.length &&
+    settings.selectedKanji.some((item) => item.startsWith("kanji:"))
+      ? defaultSettings.selectedKanji
+      : selectedKanji;
+  const kanaScript = scriptValues.has(settings.kanaScript)
+    ? settings.kanaScript
+    : defaultSettings.kanaScript;
+  const mode = modeValues.has(settings.mode)
+    ? settings.mode
+    : defaultSettings.mode;
 
   return {
-    mode: modeValues.has(settings.mode) ? settings.mode : defaultSettings.mode,
-    kanaScript: scriptValues.has(settings.kanaScript)
-      ? settings.kanaScript
-      : defaultSettings.kanaScript,
+    mode:
+      kanaScript === scripts.kanji && mode === modes.words ? modes.learn : mode,
+    kanaScript,
     shuffle:
       typeof settings.shuffle === "boolean"
         ? settings.shuffle
@@ -137,6 +165,7 @@ export const normalizeSettings = (settings = {}) => {
       ? settings.wordPrompt
       : defaultSettings.wordPrompt,
     selectedRows,
+    selectedKanji: migratedKanji,
   };
 };
 
@@ -165,8 +194,31 @@ export const clearSettings = (storage = globalThis.localStorage) => {
   }
 };
 
-export const getInitialList = (selectedRows = defaultSettings.selectedRows) => {
-  const selected = new Set(selectedRows);
+export const getInitialList = (selectedRows, kanaScript = scripts.hiragana) => {
+  const selected = new Set(
+    selectedRows ??
+      (kanaScript === scripts.kanji
+        ? defaultSettings.selectedKanji
+        : defaultSettings.selectedRows),
+  );
+
+  if (kanaScript === scripts.kanji) {
+    return [
+      {
+        title: "jlpt",
+        label: "JLPT estimates",
+        rows: kanji.map((group) => {
+          const id = `kanji:${group.group}`;
+          return {
+            id,
+            value: group.label,
+            checked: selected.has(id),
+          };
+        }),
+      },
+    ];
+  }
+
   return japanese.map((group) => ({
     title: group.group,
     rows: group.rows.map((row) => ({
@@ -186,7 +238,7 @@ const getSelectedKana = (list, kanaScript) => {
   const selectedRows = new Set(getSelectedRows(list));
   const kanaKey = getKanaKey(kanaScript);
   return new Set(
-    rowDefinitions.flatMap(({ id, row }) => {
+    kanaRowDefinitions.flatMap(({ id, row }) => {
       if (!selectedRows.has(id)) return [];
       return row.filter((item) => item.roumaji).map((item) => item[kanaKey]);
     }),
@@ -214,7 +266,7 @@ const getKanaItems = (list, kanaScript) => {
 
   if (!selectedRows.size) return [];
 
-  return rowDefinitions.flatMap(({ id, row }) => {
+  return kanaRowDefinitions.flatMap(({ id, row }) => {
     if (!selectedRows.has(id)) return [];
     return row
       .filter((item) => item.roumaji)
@@ -225,6 +277,21 @@ const getKanaItems = (list, kanaScript) => {
         }),
       );
   });
+};
+
+const getKanjiItems = (list) => {
+  const selectedLevels = new Set(getSelectedRows(list));
+  return kanjiDefinitions.flatMap(({ id, group }) =>
+    selectedLevels.has(id)
+      ? group.items.map((item) =>
+          Object.assign({}, item, {
+            kind: "kanji",
+            level: group.label,
+            audio: getKanjiAudio(item),
+          }),
+        )
+      : [],
+  );
 };
 
 const getWordItems = (list, kanaScript) => {
@@ -248,9 +315,13 @@ const getWordItems = (list, kanaScript) => {
 
 export const getDeck = ({ list, mode, kanaScript, shuffle: shouldShuffle }) => {
   const items =
-    mode === modes.words
-      ? getWordItems(list, kanaScript)
-      : getKanaItems(list, kanaScript);
+    kanaScript === scripts.kanji
+      ? getKanjiItems(list)
+      : mode === modes.words
+        ? getWordItems(list, kanaScript)
+        : getKanaItems(list, kanaScript);
 
-  return mode === modes.words || shouldShuffle ? shuffle(items) : items;
+  return (mode === modes.words && kanaScript !== scripts.kanji) || shouldShuffle
+    ? shuffle(items)
+    : items;
 };

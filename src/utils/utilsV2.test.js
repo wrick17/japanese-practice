@@ -1,17 +1,21 @@
 import { expect, test } from "bun:test";
 
 import { japanese } from "../constants/constantsV2";
+import { kanji, kanjiSource } from "../constants/kanjiV1";
 import {
   clearSettings,
   defaultSettings,
   getDeck,
   getInitialList,
+  getKanjiAudio,
   getKanaRomajiDisplay,
   loadSettings,
   modes,
+  normalizeSettings,
   saveSettings,
   scripts,
   shuffle,
+  speak,
   STORAGE_KEY,
   wordPrompts,
 } from "./utilsV2";
@@ -166,6 +170,22 @@ test("builds one selector row for each kana row", () => {
   expect(list.flatMap((group) => group.rows)).toHaveLength(expectedRows);
 });
 
+test("builds JLPT-estimate Kanji selectors with N5 selected", () => {
+  const list = getInitialList(undefined, scripts.kanji);
+
+  expect(list).toHaveLength(1);
+  expect(list[0].label).toBe("JLPT estimates");
+  expect(
+    list[0].rows.map(({ value, checked }) => ({ value, checked })),
+  ).toEqual([
+    { value: "N5", checked: true },
+    { value: "N4", checked: false },
+    { value: "N3", checked: false },
+    { value: "N2", checked: false },
+    { value: "N1", checked: false },
+  ]);
+});
+
 test("keeps the standalone n selector distinct from the na row", () => {
   const gojuuonRows = getInitialList()[0].rows.map((row) => row.value);
 
@@ -225,6 +245,65 @@ test("learn mode supports multiple selected rows", () => {
     "ke",
     "ko",
   ]);
+});
+
+test("builds a complete Kanji deck from selected JLPT estimates", () => {
+  const selectedKanji = ["kanji:n5", "kanji:n4"];
+  const deck = getDeck({
+    list: getInitialList(selectedKanji, scripts.kanji),
+    mode: modes.learn,
+    kanaScript: scripts.kanji,
+    shuffle: false,
+  });
+
+  expect(deck).toHaveLength(80 + 166);
+  expect(new Set(deck.map((item) => item.level))).toEqual(
+    new Set(["N5", "N4"]),
+  );
+  expect(deck.find((item) => item.japanese === "一")).toMatchObject({
+    on: ["イチ", "イツ"],
+    kun: ["ひと-", "ひと.つ"],
+    meanings: ["one", "one radical (no.1)"],
+    kind: "kanji",
+    level: "N5",
+    audio: "イチ",
+  });
+});
+
+test("replaces queued speech before announcing the next item", () => {
+  const originalSpeechSynthesis = globalThis.speechSynthesis;
+  const OriginalUtterance = globalThis.SpeechSynthesisUtterance;
+  const events = [];
+
+  globalThis.speechSynthesis = {
+    cancel: () => events.push("cancel"),
+    getVoices: () => [],
+    speak: (utterance) => events.push(`speak:${utterance.text}`),
+  };
+  globalThis.SpeechSynthesisUtterance = function (text) {
+    this.text = text;
+  };
+
+  try {
+    speak("八");
+    expect(events).toEqual(["cancel", "speak:八"]);
+  } finally {
+    if (originalSpeechSynthesis === undefined) {
+      delete globalThis.speechSynthesis;
+    } else {
+      globalThis.speechSynthesis = originalSpeechSynthesis;
+    }
+    if (OriginalUtterance === undefined) {
+      delete globalThis.SpeechSynthesisUtterance;
+    } else {
+      globalThis.SpeechSynthesisUtterance = OriginalUtterance;
+    }
+  }
+});
+
+test("uses one clean primary Kanji reading for speech", () => {
+  expect(getKanjiAudio({ on: ["-ノウ"], kun: [] })).toBe("ノウ");
+  expect(getKanjiAudio({ on: [], kun: ["こ.む"] })).toBe("こむ");
 });
 
 test("keeps kana romaji beside its pronunciation cue", () => {
@@ -326,6 +405,98 @@ test("loads, saves, and clears local settings", () => {
 
   clearSettings(storage);
   expect(storage.getItem(STORAGE_KEY)).toBeNull();
+});
+
+test("migrates saved kana settings and rejects Words mode for Kanji", () => {
+  const savedKana = normalizeSettings({
+    mode: modes.learn,
+    kanaScript: scripts.hiragana,
+    selectedRows: ["gojuuon:a"],
+  });
+  const savedKanji = normalizeSettings({
+    ...savedKana,
+    mode: modes.words,
+    kanaScript: scripts.kanji,
+  });
+
+  expect(savedKana.selectedKanji).toEqual(defaultSettings.selectedKanji);
+  expect(savedKanji.mode).toBe(modes.learn);
+  expect(
+    normalizeSettings({ selectedKanji: ["kanji:numbers:一"] }).selectedKanji,
+  ).toEqual(defaultSettings.selectedKanji);
+  expect(normalizeSettings({ selectedKanji: [] }).selectedKanji).toEqual([]);
+});
+
+test("JLPT-estimate Kanji data has unique, complete N5-N1 cards", () => {
+  const items = kanji.flatMap((group) => group.items);
+
+  expect(kanjiSource.levels.commit).toBe(
+    "00fd7079c3890f430759536f91aa5e854ec0ca4f",
+  );
+  expect(kanjiSource.kanjidic).toMatchObject({
+    name: "KANJIDIC2",
+    url: "https://www.edrdg.org/kanjidic/kanjidic2.xml.gz",
+    projectUrl: "https://www.edrdg.org/wiki/KANJIDIC_Project.html",
+    licenseUrl: "https://www.edrdg.org/edrdg/licence.html",
+  });
+  expect(kanjiSource.kanjidic.databaseVersion).toMatch(/^\d{4}-\d+$/);
+  expect(kanjiSource.kanjidic.dateOfCreation).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  expect(kanjiSource.kanjidic.gzipSha256).toMatch(/^[\da-f]{64}$/);
+  expect(kanji.map((group) => group.items.length)).toEqual([
+    80, 166, 367, 373, 1244,
+  ]);
+  expect(kanjiSource.levels.nullFallback).toMatchObject({
+    oldField: "jlpt_old",
+    oldToNew: { 1: 1, 2: 2, 3: 4, 4: 5 },
+  });
+  expect(kanjiSource.levels.nullFallback.characters).toHaveLength(19);
+  expect(items).toHaveLength(2230);
+  expect(new Set(items.map((item) => item.japanese)).size).toBe(items.length);
+  for (const item of items) {
+    expect(item.japanese).toMatch(/^\p{Script=Han}$/u);
+    expect(item.on.length + item.kun.length).toBeGreaterThan(0);
+    expect(item.meanings.length).toBeGreaterThan(0);
+    expect(getKanjiAudio(item)).toMatch(
+      /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u,
+    );
+    expect(new Set(item.on).size).toBe(item.on.length);
+    expect(new Set(item.kun).size).toBe(item.kun.length);
+    expect(new Set(item.meanings).size).toBe(item.meanings.length);
+    for (const value of [...item.on, ...item.kun, ...item.meanings]) {
+      expect(value.length).toBeGreaterThan(0);
+      expect(value).toBe(value.trim());
+      expect(value).toBe(value.normalize("NFC"));
+    }
+  }
+});
+
+test("fills missing new-JLPT estimates from the legacy level mapping", () => {
+  const levelByCharacter = new Map(
+    kanji.flatMap((group) =>
+      group.items.map((item) => [item.japanese, group.label]),
+    ),
+  );
+
+  expect(levelByCharacter.get("分")).toBe("N5");
+  expect(levelByCharacter.get("的")).toBe("N2");
+  expect(levelByCharacter.get("里")).toBe("N1");
+});
+
+test("includes corrections from the recorded official KANJIDIC2 snapshot", () => {
+  const items = new Map(
+    kanji.flatMap((group) => group.items.map((item) => [item.japanese, item])),
+  );
+
+  expect(items.get("八").on).toContain("ハツ");
+  expect(items.get("十").kun).toContain("そ");
+  expect(items.get("実").meanings).toEqual(
+    expect.arrayContaining(["seed", "fruit", "nut"]),
+  );
+  expect(items.get("乾").meanings).toContain("desiccate");
+  expect(items.get("仰").meanings).toContain("revere");
+  expect(items.get("檀").meanings).toContain("sandalwood");
+  expect(items.get("打").on).toContain("ダース");
+  expect(items.get("王").on).toContain("-ノウ");
 });
 
 test("falls back to defaults for corrupt settings", () => {

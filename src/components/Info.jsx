@@ -5,8 +5,9 @@ export const Info = () => {
         <summary>How to use the platform</summary>
         <div className="usage-guide-content">
           <p>
-            Start with one kana row, such as the <strong>a row</strong>, and
-            follow these steps in order:
+            For kana, start with one row such as the <strong>a row</strong>. For
+            Kanji, start with the <strong>N5 estimate</strong>. Then follow
+            these steps in order:
           </p>
           <ol>
             <li>
@@ -14,16 +15,16 @@ export const Info = () => {
               practise writing it.
             </li>
             <li>
-              <strong>Japanese to Romaji:</strong> Look at each character and
-              practise remembering how it sounds.
+              <strong>Character to Reading:</strong> Look at each character and
+              practise remembering its reading.
             </li>
             <li>
-              <strong>Romaji to Japanese:</strong> Read the sound and practise
+              <strong>Reading to Character:</strong> Read the sound and practise
               remembering the character.
             </li>
             <li>
-              <strong>Words:</strong> Practise words made from that row so the
-              characters become easier to remember.
+              <strong>Words:</strong> After kana, practise words made from your
+              selected rows so the characters become easier to remember.
             </li>
           </ol>
           <p>
@@ -38,12 +39,14 @@ export const Info = () => {
         <div className="usage-guide-content">
           <ul>
             <li>
-              <strong>Choose your practice:</strong> Switch between Hiragana and
-              Katakana, then select one row or combine several rows.
+              <strong>Choose your practice:</strong> Switch between Hiragana,
+              Katakana, and Kanji, then select one or more study groups.
             </li>
             <li>
               <strong>Hear Japanese:</strong> Tap the practice card to hear it.
-              Announce mode reads each new card automatically.
+              Kanji uses the first listed on-yomi, or the first kun-yomi when no
+              on-yomi is listed. Announce mode reads each new card
+              automatically.
             </li>
             <li>
               <strong>Practise real words:</strong> Words use only kana from
@@ -56,8 +59,8 @@ export const Info = () => {
             </li>
             <li>
               <strong>Use quick study tools:</strong> Reveal answers, open the
-              kana chart, or press the <strong>?</strong> button to see keyboard
-              shortcuts.
+              chart or Kanji reference, or press the <strong>?</strong> button
+              to see keyboard shortcuts.
             </li>
             <li>
               <strong>Continue later:</strong> Your selections and settings are
@@ -68,18 +71,61 @@ export const Info = () => {
       </details>
       <p className="credits">
         Made by{" "}
-        <a target="__blank" href="https://www.wrick17.com">
+        <a href="https://www.wrick17.com" rel="noreferrer" target="_blank">
           Wrick
         </a>{" "}
         with source on{" "}
-        <a target="__blank" href="https://github.com/wrick17/japanese-practice">
+        <a
+          href="https://github.com/wrick17/japanese-practice"
+          rel="noreferrer"
+          target="_blank"
+        >
           GitHub
         </a>{" "}
         and hosting on{" "}
-        <a target="__blank" href="https://pages.cloudflare.com/">
+        <a
+          href="https://pages.cloudflare.com/"
+          rel="noreferrer"
+          target="_blank"
+        >
           Cloudflare Pages
         </a>
-        .
+        {"."}
+      </p>
+      <p className="credits">
+        Kanji readings and meanings from{" "}
+        <a
+          href="https://www.edrdg.org/wiki/KANJIDIC_Project.html"
+          rel="noreferrer"
+          target="_blank"
+        >
+          KANJIDIC2
+        </a>{" "}
+        © EDRDG under{" "}
+        <a
+          href="https://creativecommons.org/licenses/by-sa/4.0/"
+          rel="noreferrer"
+          target="_blank"
+        >
+          CC BY-SA 4.0
+        </a>
+        {"; "}JLPT estimates from{" "}
+        <a
+          href="https://github.com/davidluzgouveia/kanji-data"
+          rel="noreferrer"
+          target="_blank"
+        >
+          kanji-data
+        </a>{" "}
+        based on{" "}
+        <a
+          href="https://www.tanos.co.uk/jlpt/"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Tanos JLPT Resources
+        </a>
+        {"."}
       </p>
     </section>
   );

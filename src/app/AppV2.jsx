@@ -25,6 +25,7 @@ const modeLabels = {
 const scriptLabels = {
   [scripts.hiragana]: "Hiragana",
   [scripts.katakana]: "Katakana",
+  [scripts.kanji]: "Kanji",
 };
 
 const wordPromptLabels = {
@@ -119,7 +120,6 @@ const AppV2 = () => {
     settings,
     updateSettings,
     reset,
-    kana,
   } = useJapanese();
   const [showAnswer, setShowAnswer] = useState(false);
   const [announce, setAnnounce] = useState(false);
@@ -127,8 +127,9 @@ const AppV2 = () => {
   const item = deck[currentItem];
   const isLearnMode = settings.mode === modes.learn;
   const isWordsMode = settings.mode === modes.words;
+  const isKanji = settings.kanaScript === scripts.kanji;
   const answerIsVisible = isLearnMode || showAnswer;
-  const speechText = item?.japanese;
+  const speechText = item?.kind === "kanji" ? item.audio : item?.japanese;
 
   const openShortcuts = useCallback(() => {
     const dialog = shortcutsDialogRef.current;
@@ -222,16 +223,30 @@ const AppV2 = () => {
               label: scriptLabels[script],
               value: script,
             }))}
-            onChange={(kanaScript) => updateSettings({ kanaScript })}
+            onChange={(kanaScript) =>
+              updateSettings({
+                kanaScript,
+                ...(kanaScript === scripts.kanji && isWordsMode
+                  ? { mode: modes.learn }
+                  : {}),
+              })
+            }
           />
           <div className="mode-control">
             <Dropdown
               label="Mode"
               value={settings.mode}
-              options={Object.values(modes).map((mode) => ({
-                label: modeLabels[mode],
-                value: mode,
-              }))}
+              options={Object.values(modes)
+                .filter((mode) => !isKanji || mode !== modes.words)
+                .map((mode) => ({
+                  label:
+                    isKanji && mode === modes.kanaToRomaji
+                      ? "Kanji to Reading"
+                      : isKanji && mode === modes.romajiToKana
+                        ? "Reading to Kanji"
+                        : modeLabels[mode],
+                  value: mode,
+                }))}
               onChange={(mode) =>
                 updateSettings({
                   mode,
@@ -312,11 +327,11 @@ const AppV2 = () => {
         </section>
 
         <section className="study-column" aria-label="Study controls">
-          <SelectorV2 list={list} setList={setList} />
+          <SelectorV2 list={list} setList={setList} stacked={isKanji} />
         </section>
       </div>
 
-      <CheatSheetV2 kana={kana} />
+      <CheatSheetV2 kanaScript={settings.kanaScript} />
       <Info />
       <ShortcutDialog dialogRef={shortcutsDialogRef} />
     </main>

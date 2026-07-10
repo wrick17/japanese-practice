@@ -1,6 +1,6 @@
 import classNames from "classnames";
 
-export const SelectorV2 = ({ list, setList }) => {
+export const SelectorV2 = ({ list, setList, stacked = false }) => {
   const onSelect = (item) => {
     const newList = list.map((listItem) => ({
       ...listItem,
@@ -38,7 +38,13 @@ export const SelectorV2 = ({ list, setList }) => {
       {list.map((group) => {
         const allChecked = group.rows.every((row) => row.checked);
         return (
-          <div className="selector-group-item" key={group.title}>
+          <div
+            className={classNames("selector-group-item", { stacked })}
+            key={group.title}
+          >
+            {group.label && (
+              <span className="selector-label">{group.label}</span>
+            )}
             <button
               className={classNames("button batch", { selected: allChecked })}
               onClick={() => toggleAll(group, allChecked)}
