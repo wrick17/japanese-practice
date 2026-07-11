@@ -270,23 +270,37 @@ test("builds a complete Kanji deck from selected JLPT estimates", () => {
   });
 });
 
-test("replaces queued speech before announcing the next item", () => {
+test("pads speech and slows single characters without changing their text", () => {
   const originalSpeechSynthesis = globalThis.speechSynthesis;
   const OriginalUtterance = globalThis.SpeechSynthesisUtterance;
+  const originalSetTimeout = globalThis.setTimeout;
+  const originalClearTimeout = globalThis.clearTimeout;
   const events = [];
+  let runScheduledSpeech;
 
   globalThis.speechSynthesis = {
     cancel: () => events.push("cancel"),
-    getVoices: () => [],
-    speak: (utterance) => events.push(`speak:${utterance.text}`),
+    getVoices: () => [{ lang: "ja-JP" }],
+    speak: (utterance) =>
+      events.push(
+        `speak:${utterance.text}:${utterance.rate}:${utterance.voice.lang}`,
+      ),
   };
   globalThis.SpeechSynthesisUtterance = function (text) {
     this.text = text;
   };
+  globalThis.setTimeout = (callback, delay) => {
+    events.push(`delay:${delay}`);
+    runScheduledSpeech = callback;
+    return 1;
+  };
+  globalThis.clearTimeout = () => {};
 
   try {
-    speak("八");
-    expect(events).toEqual(["cancel", "speak:八"]);
+    speak("な");
+    expect(events).toEqual(["cancel", "delay:100"]);
+    runScheduledSpeech();
+    expect(events).toEqual(["cancel", "delay:100", "speak:な:0.05:ja-JP"]);
   } finally {
     if (originalSpeechSynthesis === undefined) {
       delete globalThis.speechSynthesis;
@@ -298,6 +312,36 @@ test("replaces queued speech before announcing the next item", () => {
     } else {
       globalThis.SpeechSynthesisUtterance = OriginalUtterance;
     }
+    globalThis.setTimeout = originalSetTimeout;
+    globalThis.clearTimeout = originalClearTimeout;
+  }
+});
+
+test("keeps longer readings at the normal reduced speech rate", () => {
+  const originalSpeechSynthesis = globalThis.speechSynthesis;
+  const OriginalUtterance = globalThis.SpeechSynthesisUtterance;
+  const originalSetTimeout = globalThis.setTimeout;
+  let utterance;
+
+  globalThis.speechSynthesis = {
+    cancel: () => {},
+    getVoices: () => [],
+    speak: (value) => {
+      utterance = value;
+    },
+  };
+  globalThis.SpeechSynthesisUtterance = function (text) {
+    this.text = text;
+  };
+  globalThis.setTimeout = (callback) => callback();
+
+  try {
+    speak("かな");
+    expect(utterance.rate).toBe(0.25);
+  } finally {
+    globalThis.speechSynthesis = originalSpeechSynthesis;
+    globalThis.SpeechSynthesisUtterance = OriginalUtterance;
+    globalThis.setTimeout = originalSetTimeout;
   }
 });
 

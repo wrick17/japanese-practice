@@ -3,6 +3,7 @@ import { japanese } from "../constants/constantsV2";
 import { kanji } from "../constants/kanjiV1";
 
 const lang = "ja-JP";
+let speechTimer;
 
 const kanaVowelSounds = {
   a: "aa",
@@ -67,12 +68,15 @@ export const speak = (input) => {
   if (!synth || typeof Utterance !== "function") return;
 
   const utterance = new Utterance(input);
-  utterance.voice = synth.getVoices().find((voice) => voice.lang === lang);
+  utterance.voice = synth
+    .getVoices()
+    .find((voice) => voice.lang.toLowerCase().startsWith("ja"));
   utterance.lang = lang;
-  utterance.rate = 0.3;
+  utterance.rate = [...input].length === 1 ? 0.05 : 0.25;
   utterance.volume = 1;
+  globalThis.clearTimeout(speechTimer);
   synth.cancel();
-  synth.speak(utterance);
+  speechTimer = globalThis.setTimeout(() => synth.speak(utterance), 100);
 };
 
 export const getKanjiAudio = (item) =>

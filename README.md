@@ -55,9 +55,8 @@ local word practice.
 - Lucide icons consistently identify navigation, audio, answer, announce,
   reset, reference, dialog, guide, and external-link actions without replacing
   their accessible text labels.
-- A beginner-friendly, collapsed "How to use the platform" guide explains the
-  recommended Learn -> Character to Reading -> Reading to Character flow, plus
-  Words practice for kana.
+- A beginner-friendly, collapsed "How to use the platform" guide keeps the
+  Kana and Kanji learning paths in separate subsections.
 - A collapsed Features guide explains card audio, announce mode, row-aware word
   practice, deck controls, study tools, shortcuts, and saved settings.
 - Defaults: Hiragana, vowel row, sequential order, Learn mode, and
@@ -68,7 +67,13 @@ local word practice.
 - Settings are stored in `localStorage` under
   `japanese-practice-settings-v1`; Reset restores defaults.
 - Keyboard shortcuts are available from the keyboard-icon popup in the header.
-- Existing service workers from older PWA builds are unregistered on app load.
+- Audio uses the browser's installed Japanese speech voice. This is the
+  correctness fallback after Piper Plus's browser runtime produced invalid
+  Japanese audio with its published CSS10 model. Speech starts after a 100 ms
+  delay, and single kana play at a slower rate so their initial sound stays clear.
+- The app registers no service worker: website files use normal HTTP browser
+  caching only. On app load, stale workers are unregistered and only the two
+  retired Piper cache names are cleared.
 - The timer feature was removed.
 
 ## Kana Scope
@@ -207,8 +212,9 @@ bun run test
 - Migrated package management from Yarn to Bun and replaced `yarn.lock` with `bun.lock`.
 - Migrated Vite config/scripts to Rsbuild config/scripts.
 - Updated dependencies to Bun-resolved latest versions on July 7, 2026.
-- Removed PWA generation; the app ships as a standard static React site and
-  unregisters service workers left by older PWA builds.
+- Removed PWA generation; the app ships as a standard static React site, does
+  not cache website files in Cache Storage, and cleans up only retired Piper
+  service-worker caches.
 - Added Oxc tooling config and a small Bun test around selector filtering.
 - Added persisted learning modes, sequential/shuffle ordering, reset defaults,
   and generated local JMdict-Simplified word practice data.

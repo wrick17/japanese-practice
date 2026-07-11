@@ -4,7 +4,58 @@ const ExternalIcon = () => (
   <ExternalLink aria-hidden="true" className="external-link-icon" />
 );
 
+export const getLearningGuide = (isKanji) =>
+  isKanji
+    ? {
+        intro: "Start with the N5 estimate and follow these steps in order:",
+        steps: [
+          {
+            label: "Learn",
+            text: "Study each Kanji's shape, meaning, on-yomi, and kun-yomi, and practise writing it.",
+          },
+          {
+            label: "Kanji to Reading",
+            text: "Look at the Kanji and recall its readings and meaning.",
+          },
+          {
+            label: "Reading to Kanji",
+            text: "Read the given sound and recall the matching Kanji and meaning.",
+          },
+        ],
+        outro:
+          "Once N5 feels familiar, add the next JLPT estimate. Mix levels only after you can recognise the earlier Kanji without relying on their order.",
+      }
+    : {
+        intro:
+          "Start with one Hiragana or Katakana row, such as the a row, and follow these steps in order:",
+        steps: [
+          {
+            label: "Learn",
+            text: "Learn what each kana looks like and practise writing it.",
+          },
+          {
+            label: "Japanese to Romaji",
+            text: "Look at each kana and recall its sound.",
+          },
+          {
+            label: "Romaji to Japanese",
+            text: "Read the sound and recall the matching kana.",
+          },
+          {
+            label: "Words",
+            text: "Practise words made from your selected rows so the kana become easier to remember.",
+          },
+        ],
+        outro:
+          "Once you know a few rows, select them together and repeat the same steps. Mixing familiar rows helps you remember them without relying on chart order.",
+      };
+
 export const Info = () => {
+  const guides = [
+    ["Kana learning path", getLearningGuide(false)],
+    ["Kanji learning path", getLearningGuide(true)],
+  ];
+
   return (
     <section className="info">
       <details className="usage-guide">
@@ -14,34 +65,20 @@ export const Info = () => {
           <ChevronDown aria-hidden="true" className="guide-chevron" />
         </summary>
         <div className="usage-guide-content">
-          <p>
-            For kana, start with one row such as the <strong>a row</strong>. For
-            Kanji, start with the <strong>N5 estimate</strong>. Then follow
-            these steps in order:
-          </p>
-          <ol>
-            <li>
-              <strong>Learn:</strong> Learn what each character looks like and
-              practise writing it.
-            </li>
-            <li>
-              <strong>Character to Reading:</strong> Look at each character and
-              practise remembering its reading.
-            </li>
-            <li>
-              <strong>Reading to Character:</strong> Read the sound and practise
-              remembering the character.
-            </li>
-            <li>
-              <strong>Words:</strong> After kana, practise words made from your
-              selected rows so the characters become easier to remember.
-            </li>
-          </ol>
-          <p>
-            Once you know a few rows, select them together and repeat the same
-            steps. Mixing familiar rows helps you remember them without relying
-            on their chart order.
-          </p>
+          {guides.map(([title, guide]) => (
+            <section className="learning-path" key={title}>
+              <h3>{title}</h3>
+              <p>{guide.intro}</p>
+              <ol>
+                {guide.steps.map(({ label, text }) => (
+                  <li key={label}>
+                    <strong>{label}:</strong> {text}
+                  </li>
+                ))}
+              </ol>
+              <p>{guide.outro}</p>
+            </section>
+          ))}
         </div>
       </details>
       <details className="usage-guide features-guide">
