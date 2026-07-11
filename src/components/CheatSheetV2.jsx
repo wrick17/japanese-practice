@@ -165,12 +165,12 @@ export const CheatSheetV2 = ({ kanaScript }) => {
               {kanaScript === scripts.kanji ? "Kanji" : "Kana"} details
             </h2>
             <button
-              className="with-icon"
+              aria-label="Close"
+              className="modal-close"
               onClick={() => dialogRef.current?.close()}
               type="button"
             >
               <X aria-hidden="true" className="button-icon" />
-              Close
             </button>
           </div>
           {selectedItem && (

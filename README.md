@@ -21,6 +21,9 @@ local word practice.
   charts retain their compact multi-column layout.
 - Five-tile Hiragana and Katakana chart rows shrink evenly within each group so
   their left and right padding stays consistent with the Yoon block.
+- Kana row selectors use a compact six-column grid, keeping the largest groups
+  within two rows at narrow widths; the All control stays text-only for clean
+  alignment.
 - Kanji audio speaks the first listed on-yomi, or the first kun-yomi when an
   entry has no on-yomi. Kanji readings depend on the word and context, so the
   full reading list remains visible on every revealed card.
@@ -138,8 +141,8 @@ teaches, stores the first English gloss, and writes stable formatted JSON.
 
 ## Keyboard Shortcuts
 
-Open the legend with the keyboard-icon button or the `?` key. Close it with
-`Esc`, the Close button, or a click outside the popup.
+Open the legend with the dimmed keyboard icon or the `?` key. Modals use a
+round icon-only close control and also close with `Esc` or a backdrop click.
 
 Pointer-activated controls release focus so shortcuts resume immediately.
 Left/Right remain available when a non-editable control keeps focus; editable

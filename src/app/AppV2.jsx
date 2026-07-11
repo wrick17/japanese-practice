@@ -97,9 +97,8 @@ const ShortcutDialog = ({ dialogRef }) => (
       <div className="shortcut-header">
         <h2 id="shortcut-dialog-title">Keyboard shortcuts</h2>
         <form method="dialog">
-          <button className="shortcut-close with-icon" type="submit">
+          <button aria-label="Close" className="modal-close" type="submit">
             <X aria-hidden="true" className="button-icon" />
-            Close
           </button>
         </form>
       </div>
@@ -353,12 +352,6 @@ const AppV2 = () => {
               type="button"
             >
               <Keyboard aria-hidden="true" className="button-icon" />
-              <kbd
-                aria-hidden="true"
-                className="shortcut-hint icon-shortcut-hint"
-              >
-                ?
-              </kbd>
             </button>
           </div>
         </section>

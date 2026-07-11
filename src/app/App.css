@@ -213,16 +213,18 @@ h3 {
 }
 
 .shortcut-button {
-  position: relative;
   flex: 0 0 40px;
   width: 40px;
   min-height: 40px;
   padding: 0;
-  border-color: rgb(103 232 249 / 0.18);
-  border-radius: 8px;
-  background-color: #161616;
-  color: #67e8f9;
+  border: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 0.46);
   font-weight: 800;
+}
+
+.shortcut-button:hover {
+  color: rgb(255 255 255 / 0.68);
 }
 
 .shortcut-hint {
@@ -237,14 +239,6 @@ h3 {
   line-height: 1;
   opacity: 0.8;
   pointer-events: none;
-}
-
-.icon-shortcut-hint {
-  position: absolute;
-  right: 3px;
-  bottom: 3px;
-  padding: 2px 3px;
-  font-size: 0.5rem;
 }
 
 .shortcut-dialog {
@@ -322,9 +316,15 @@ h3 {
   font-size: 1.05rem;
 }
 
-.shortcut-close {
+.modal-close {
+  display: inline-flex;
+  width: 34px;
   min-height: 34px;
+  align-items: center;
+  justify-content: center;
   border-color: rgb(255 255 255 / 0.12);
+  border-radius: 50%;
+  padding: 0;
   background-color: transparent;
   color: rgb(255 255 255 / 0.78);
 }
@@ -813,7 +813,7 @@ kbd {
   background-color: #1a1a1a;
   border-radius: 8px;
   margin-bottom: 8px;
-  padding: 4px;
+  padding: 8px 4px;
 }
 
 .selector-label {
@@ -856,14 +856,15 @@ kbd {
 }
 
 .selector-group ul {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 40px));
+  gap: 8px;
   justify-content: flex-start;
   align-items: center;
   list-style: none;
   font-size: 1.5em;
   width: 95%;
   text-transform: capitalize;
-  flex-wrap: wrap;
   margin: 0 auto;
   padding: 0;
 }
@@ -871,10 +872,9 @@ kbd {
 .selector-group li {
   display: flex;
   align-items: center;
-  margin: 4px;
   aspect-ratio: 1;
   height: 40px;
-  width: 40px;
+  min-width: 0;
 }
 
 .selector-group ul button {
