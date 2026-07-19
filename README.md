@@ -68,7 +68,7 @@ local word practice.
   `japanese-practice-settings-v1`; Reset restores defaults.
 - Keyboard shortcuts are available from the keyboard-icon popup in the header.
 - Audio normally uses the browser's installed Japanese speech voice. Safari 27
-  on iPhone uses a cached MP3 from the `/api/tts` Pages Function because that
+  on iPhone uses cached audio from the `/api/tts` Pages Function because that
   release can report successful Web Speech events while producing no sound. The
   fallback validates short Japanese-only input, generates it with Cloudflare's
   MeloTTS Workers AI model, and plays it through the native media element. This
@@ -186,7 +186,7 @@ retain native Tab and Enter/Space behavior.
 - Automatic production branch deployments: enabled.
 - Git source: `wrick17/japanese-practice`.
 - Workers AI binding: `AI`, declared in `wrangler.jsonc` and used by the
-  Safari 27 `/api/tts` Pages Function. Generated MP3 responses are cached for
+  Safari 27 `/api/tts` Pages Function. Generated audio responses are cached for
   one year, and requests are limited to 32 Japanese characters.
 - Custom domain: `japanese.wrick17.com`.
 - DNS target: `japanese-practice-c5y.pages.dev` after the custom domain is added

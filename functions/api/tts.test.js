@@ -24,7 +24,7 @@ test("returns generated MP3 audio with long-lived cache headers", async () => {
       AI: {
         run: async (...arguments_) => {
           calls.push(arguments_);
-          return { audio: btoa("mp3") };
+          return { audio: btoa("RIFFwave") };
         },
       },
     },
@@ -34,9 +34,9 @@ test("returns generated MP3 audio with long-lived cache headers", async () => {
   expect(calls).toEqual([
     ["@cf/myshell-ai/melotts", { prompt: "かな", lang: "ja" }],
   ]);
-  expect(response.headers.get("Content-Type")).toBe("audio/mpeg");
+  expect(response.headers.get("Content-Type")).toBe("audio/wav");
   expect(response.headers.get("Cache-Control")).toContain("immutable");
-  expect(await response.text()).toBe("mp3");
+  expect(await response.text()).toBe("RIFFwave");
 });
 
 test("rejects invalid input before calling Workers AI", async () => {

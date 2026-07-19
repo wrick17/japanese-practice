@@ -32,10 +32,15 @@ export const onRequestGet = async ({ request, env, waitUntil }) => {
   const result = await env.AI.run(model, { prompt: text, lang: "ja" });
   if (!result?.audio) return errorResponse("Speech generation failed", 502);
 
-  const response = new Response(decodeBase64(result.audio), {
+  const audio = decodeBase64(result.audio);
+  const contentType =
+    new TextDecoder().decode(audio.subarray(0, 4)) === "RIFF"
+      ? "audio/wav"
+      : "audio/mpeg";
+  const response = new Response(audio, {
     headers: {
       "Cache-Control": "public, max-age=31536000, immutable",
-      "Content-Type": "audio/mpeg",
+      "Content-Type": contentType,
       "X-Content-Type-Options": "nosniff",
     },
   });
