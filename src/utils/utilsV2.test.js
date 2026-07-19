@@ -9,6 +9,7 @@ import {
   getInitialList,
   getKanjiAudio,
   getKanaRomajiDisplay,
+  needsNativeSpeechAudio,
   loadSettings,
   modes,
   normalizeSettings,
@@ -270,16 +271,12 @@ test("builds a complete Kanji deck from selected JLPT estimates", () => {
   });
 });
 
-test("pads speech and slows single characters without changing their text", () => {
+test("speaks single characters immediately at a slower rate", () => {
   const originalSpeechSynthesis = globalThis.speechSynthesis;
   const OriginalUtterance = globalThis.SpeechSynthesisUtterance;
-  const originalSetTimeout = globalThis.setTimeout;
-  const originalClearTimeout = globalThis.clearTimeout;
   const events = [];
-  let runScheduledSpeech;
 
   globalThis.speechSynthesis = {
-    cancel: () => events.push("cancel"),
     getVoices: () => [{ lang: "ja-JP" }],
     speak: (utterance) =>
       events.push(
@@ -289,18 +286,10 @@ test("pads speech and slows single characters without changing their text", () =
   globalThis.SpeechSynthesisUtterance = function (text) {
     this.text = text;
   };
-  globalThis.setTimeout = (callback, delay) => {
-    events.push(`delay:${delay}`);
-    runScheduledSpeech = callback;
-    return 1;
-  };
-  globalThis.clearTimeout = () => {};
 
   try {
     speak("な");
-    expect(events).toEqual(["cancel", "delay:100"]);
-    runScheduledSpeech();
-    expect(events).toEqual(["cancel", "delay:100", "speak:な:0.05:ja-JP"]);
+    expect(events).toEqual(["speak:な:0.1:ja-JP"]);
   } finally {
     if (originalSpeechSynthesis === undefined) {
       delete globalThis.speechSynthesis;
@@ -312,9 +301,43 @@ test("pads speech and slows single characters without changing their text", () =
     } else {
       globalThis.SpeechSynthesisUtterance = OriginalUtterance;
     }
-    globalThis.setTimeout = originalSetTimeout;
-    globalThis.clearTimeout = originalClearTimeout;
   }
+});
+
+test("uses native media audio for Safari 27 on iPhone", () => {
+  const originalAudio = globalThis.Audio;
+  const originalNavigator = globalThis.navigator;
+  const events = [];
+
+  globalThis.navigator = {
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
+  };
+  globalThis.Audio = function (source) {
+    this.source = source;
+    this.pause = () => events.push("pause");
+    this.play = () => {
+      events.push(`play:${this.source}:${this.playbackRate}`);
+      return Promise.resolve();
+    };
+  };
+
+  try {
+    expect(needsNativeSpeechAudio(globalThis.navigator.userAgent)).toBe(true);
+    speak("な");
+    expect(events).toEqual(["play:/api/tts?text=%E3%81%AA:0.75"]);
+  } finally {
+    globalThis.Audio = originalAudio;
+    globalThis.navigator = originalNavigator;
+  }
+});
+
+test("does not use the native media fallback on earlier Safari versions", () => {
+  expect(
+    needsNativeSpeechAudio(
+      "Mozilla/5.0 (iPhone) Version/26.0 Mobile/15E148 Safari/604.1",
+    ),
+  ).toBe(false);
 });
 
 test("keeps longer readings at the normal reduced speech rate", () => {

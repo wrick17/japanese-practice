@@ -3,7 +3,24 @@ import { japanese } from "../constants/constantsV2";
 import { kanji } from "../constants/kanjiV1";
 
 const lang = "ja-JP";
-let speechTimer;
+
+let speechAudio;
+
+export const needsNativeSpeechAudio = (userAgent = "") =>
+  /iP(?:hone|ad|od)/.test(userAgent) &&
+  /Version\/27(?:\.|\s)/.test(userAgent) &&
+  /Safari\//.test(userAgent);
+
+const speakWithNativeAudio = (input) => {
+  const Audio = globalThis.Audio;
+  if (typeof Audio !== "function") return false;
+
+  speechAudio?.pause();
+  speechAudio = new Audio(`/api/tts?text=${encodeURIComponent(input)}`);
+  speechAudio.playbackRate = [...input].length === 1 ? 0.75 : 0.9;
+  speechAudio.play().catch(() => {});
+  return true;
+};
 
 const kanaVowelSounds = {
   a: "aa",
@@ -63,6 +80,13 @@ const kanaMap = {
 
 export const speak = (input) => {
   if (!input) return;
+  if (
+    needsNativeSpeechAudio(globalThis.navigator?.userAgent) &&
+    speakWithNativeAudio(input)
+  ) {
+    return;
+  }
+
   const synth = globalThis.speechSynthesis;
   const Utterance = globalThis.SpeechSynthesisUtterance;
   if (!synth || typeof Utterance !== "function") return;
@@ -72,11 +96,9 @@ export const speak = (input) => {
     .getVoices()
     .find((voice) => voice.lang.toLowerCase().startsWith("ja"));
   utterance.lang = lang;
-  utterance.rate = [...input].length === 1 ? 0.05 : 0.25;
+  utterance.rate = [...input].length === 1 ? 0.1 : 0.25;
   utterance.volume = 1;
-  globalThis.clearTimeout(speechTimer);
-  synth.cancel();
-  speechTimer = globalThis.setTimeout(() => synth.speak(utterance), 100);
+  synth.speak(utterance);
 };
 
 export const getKanjiAudio = (item) =>
