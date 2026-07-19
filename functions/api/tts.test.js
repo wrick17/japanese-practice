@@ -16,7 +16,7 @@ test("accepts short Japanese study text only", () => {
   ).toBe(undefined);
 });
 
-test("returns generated MP3 audio with long-lived cache headers", async () => {
+test("returns generated audio with long-lived cache headers", async () => {
   const calls = [];
   const response = await onRequestGet({
     request: new Request("https://example.com/api/tts?text=かな"),
