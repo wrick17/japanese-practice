@@ -32,12 +32,8 @@ test("maps keyboard shortcuts to practice actions", () => {
   expect(getKeyboardShortcutAction(eventFor("ArrowRight"))).toBe(
     shortcutActions.nextCard,
   );
-  expect(getKeyboardShortcutAction(eventFor("p"))).toBe(
-    shortcutActions.playSound,
-  );
-  expect(getKeyboardShortcutAction(eventFor("A"))).toBe(
-    shortcutActions.toggleAnnounce,
-  );
+  expect(getKeyboardShortcutAction(eventFor("p"))).toBeNull();
+  expect(getKeyboardShortcutAction(eventFor("A"))).toBeNull();
   expect(getKeyboardShortcutAction(eventFor("?"))).toBe(
     shortcutActions.openLegend,
   );
@@ -104,8 +100,6 @@ test("documents each handled shortcut in the legend", () => {
     "\u2190",
     "\u2192",
     "Enter",
-    "P",
-    "A",
     "?",
     "Esc",
   ]);

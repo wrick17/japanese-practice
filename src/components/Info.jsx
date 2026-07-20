@@ -94,12 +94,6 @@ export const Info = () => {
               Katakana, and Kanji, then select one or more study groups.
             </li>
             <li>
-              <strong>Hear Japanese:</strong> Tap the practice card to hear it.
-              Kanji uses the first listed on-yomi, or the first kun-yomi when no
-              on-yomi is listed. Announce mode reads each new card
-              automatically.
-            </li>
-            <li>
               <strong>Practise real words:</strong> Words use only kana from
               your selected rows, with Japanese, romaji, or English prompts.
             </li>

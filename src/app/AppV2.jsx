@@ -19,7 +19,7 @@ import {
   shortcutActions,
 } from "../utils/keyboardShortcuts";
 import { isOutsideDialog } from "../utils/dialog";
-import { modes, scripts, speak, wordPrompts } from "../utils/utilsV2";
+import { modes, scripts, wordPrompts } from "../utils/utilsV2";
 
 import "./App.css";
 
@@ -80,6 +80,45 @@ const Dropdown = ({ label, value, options, onChange }) => {
   );
 };
 
+const MultiSelectDropdown = ({ label, values, options, onChange }) => {
+  const selectedLabels = options
+    .filter((option) => values.includes(option.value))
+    .map((option) => option.label);
+  const toggleOption = (value) => {
+    const nextValues = values.includes(value)
+      ? values.filter((selected) => selected !== value)
+      : options
+          .map((option) => option.value)
+          .filter((option) => [...values, value].includes(option));
+    if (nextValues.length) onChange(nextValues);
+  };
+
+  return (
+    <div className="select-control">
+      <span>{label}</span>
+      <details className="dropdown-control">
+        <summary aria-label={`${label}: ${selectedLabels.join(", ")}`}>
+          {values.length === 1 ? selectedLabels[0] : `${values.length} scripts`}
+          <ChevronDown aria-hidden="true" className="dropdown-chevron" />
+        </summary>
+        <div className="dropdown-menu">
+          {options.map((option) => (
+            <button
+              aria-pressed={values.includes(option.value)}
+              className={values.includes(option.value) ? "active" : ""}
+              key={option.value}
+              onClick={() => toggleOption(option.value)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </details>
+    </div>
+  );
+};
+
 const Logo = () => (
   <div aria-hidden="true" className="app-logo">
     <span className="logo-kana">あ</span>
@@ -118,7 +157,7 @@ const ShortcutDialog = ({ dialogRef }) => (
 
 const AppV2 = () => {
   const {
-    list,
+    lists,
     setList,
     deck,
     next,
@@ -129,21 +168,20 @@ const AppV2 = () => {
     reset,
   } = useJapanese();
   const [showAnswer, setShowAnswer] = useState(false);
-  const [announce, setAnnounce] = useState(false);
   const shortcutsDialogRef = useRef(null);
   const item = deck[currentItem];
   const isLearnMode = settings.mode === modes.learn;
   const isWordsMode = settings.mode === modes.words;
-  const isKanji = settings.kanaScript === scripts.kanji;
+  const hasKanji = settings.selectedScripts.includes(scripts.kanji);
+  const onlyKanji =
+    settings.selectedScripts.length === 1 &&
+    settings.selectedScripts[0] === scripts.kanji;
   const answerIsVisible = isLearnMode || showAnswer;
-  const speechText = item?.kind === "kanji" ? item.audio : item?.japanese;
 
   const openShortcuts = useCallback(() => {
     const dialog = shortcutsDialogRef.current;
     if (dialog && !dialog.open) dialog.showModal();
   }, []);
-
-  const playSound = useCallback(() => speak(speechText), [speechText]);
 
   const toggleAnswer = useCallback(() => {
     if (!isLearnMode) setShowAnswer((current) => !current);
@@ -152,10 +190,6 @@ const AppV2 = () => {
   useEffect(() => {
     setShowAnswer(false);
   }, [item, settings.mode, settings.wordPrompt]);
-
-  useEffect(() => {
-    if (announce) speak(speechText);
-  }, [item, announce, speechText]);
 
   useEffect(() => {
     const handleDocumentClick = (event) => {
@@ -204,16 +238,12 @@ const AppV2 = () => {
         previous();
       } else if (action === shortcutActions.nextCard) {
         next();
-      } else if (action === shortcutActions.playSound) {
-        playSound();
-      } else if (action === shortcutActions.toggleAnnounce) {
-        setAnnounce((current) => !current);
       }
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [item, next, openShortcuts, playSound, previous, toggleAnswer]);
+  }, [item, next, openShortcuts, previous, toggleAnswer]);
 
   return (
     <main className="select">
@@ -225,35 +255,32 @@ const AppV2 = () => {
             settings.mode === modes.words ? "has-prompt" : ""
           }`}
         >
-          <Dropdown
+          <MultiSelectDropdown
             label="Script"
-            value={settings.kanaScript}
+            values={settings.selectedScripts}
             options={Object.values(scripts).map((script) => ({
               label: scriptLabels[script],
               value: script,
             }))}
-            onChange={(kanaScript) =>
-              updateSettings({
-                kanaScript,
-                ...(kanaScript === scripts.kanji && isWordsMode
-                  ? { mode: modes.learn }
-                  : {}),
-              })
-            }
+            onChange={(selectedScripts) => updateSettings({ selectedScripts })}
           />
           <div className="mode-control">
             <Dropdown
               label="Mode"
               value={settings.mode}
               options={Object.values(modes)
-                .filter((mode) => !isKanji || mode !== modes.words)
+                .filter((mode) => !onlyKanji || mode !== modes.words)
                 .map((mode) => ({
                   label:
-                    isKanji && mode === modes.kanaToRomaji
+                    onlyKanji && mode === modes.kanaToRomaji
                       ? "Kanji to Reading"
-                      : isKanji && mode === modes.romajiToKana
+                      : onlyKanji && mode === modes.romajiToKana
                         ? "Reading to Kanji"
-                        : modeLabels[mode],
+                        : hasKanji && mode === modes.kanaToRomaji
+                          ? "Japanese to Reading"
+                          : hasKanji && mode === modes.romajiToKana
+                            ? "Reading to Japanese"
+                            : modeLabels[mode],
                   value: mode,
                 }))}
               onChange={(mode) =>
@@ -308,11 +335,9 @@ const AppV2 = () => {
             answerLocked={isLearnMode}
             item={item}
             mode={settings.mode}
-            announce={announce}
-            onSpeak={playSound}
-            onToggleAnnounce={() => setAnnounce((current) => !current)}
             onToggleAnswer={toggleAnswer}
             show={answerIsVisible}
+            showScriptHint={settings.selectedScripts.length > 1}
             wordPrompt={settings.wordPrompt}
           />
 
@@ -357,11 +382,22 @@ const AppV2 = () => {
         </section>
 
         <section className="study-column" aria-label="Study controls">
-          <SelectorV2 list={list} setList={setList} stacked={isKanji} />
+          {settings.selectedScripts.map((script) => (
+            <div className="script-selector" key={script}>
+              <h2>{scriptLabels[script]} rows</h2>
+              <SelectorV2
+                list={lists[script]}
+                setList={(list) => setList(script, list)}
+                stacked={script === scripts.kanji}
+              />
+            </div>
+          ))}
         </section>
       </div>
 
-      <CheatSheetV2 kanaScript={settings.kanaScript} />
+      {settings.selectedScripts.map((script) => (
+        <CheatSheetV2 kanaScript={script} key={script} />
+      ))}
       <Info />
       <ShortcutDialog dialogRef={shortcutsDialogRef} />
     </main>

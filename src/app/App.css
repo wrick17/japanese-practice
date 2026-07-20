@@ -297,7 +297,6 @@ h3 {
 
 .study-dialog-card .block {
   width: 100%;
-  cursor: pointer;
 }
 
 .shortcut-panel {
@@ -399,6 +398,22 @@ kbd {
 .study-column {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.script-selector {
+  border-radius: 10px;
+  padding-top: 8px;
+  background: #141414;
+}
+
+.script-selector h2 {
+  margin: 0 16px 8px;
+  color: rgb(255 255 255 / 0.72);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 .practice-stage {
@@ -431,39 +446,8 @@ kbd {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  cursor: pointer;
   padding: 24px;
   overflow: hidden;
-}
-
-.card-audio-icon {
-  position: absolute;
-  z-index: 1;
-  top: 14px;
-  right: 14px;
-  width: 20px;
-  height: 20px;
-  color: #67e8f9;
-  opacity: 0.5;
-  pointer-events: none;
-}
-
-.card-audio-control {
-  position: absolute;
-  z-index: 1;
-  top: 14px;
-  right: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  color: #67e8f9;
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-.card-audio-control .button-icon {
-  width: 20px;
-  height: 20px;
 }
 
 .block.kana,
@@ -598,7 +582,7 @@ kbd {
 
 .card-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
   justify-content: center;
   width: min(100%, 460px);

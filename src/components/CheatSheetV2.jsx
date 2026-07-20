@@ -1,17 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
-import { BookOpen, EyeOff, Volume2, X } from "lucide-react";
+import { BookOpen, EyeOff, X } from "lucide-react";
 
 import { japanese } from "../constants/constantsV2";
 import { kanji } from "../constants/kanjiV1";
 import { isOutsideDialog } from "../utils/dialog";
-import {
-  getKanaKey,
-  getKanjiAudio,
-  modes,
-  scripts,
-  speak,
-} from "../utils/utilsV2";
+import { getKanaKey, modes, scripts } from "../utils/utilsV2";
 import { getStudyFields, RevealedCard } from "./ShowCase";
 
 const groupLabels = {
@@ -26,6 +20,12 @@ export const CheatSheetV2 = ({ kanaScript }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const dialogRef = useRef(null);
   const kana = getKanaKey(kanaScript);
+  const scriptLabel =
+    kanaScript === scripts.kanji
+      ? "Kanji"
+      : kanaScript === scripts.katakana
+        ? "Katakana"
+        : "Hiragana";
   const groups =
     kanaScript === scripts.kanji
       ? kanji.map((group) => ({
@@ -34,12 +34,10 @@ export const CheatSheetV2 = ({ kanaScript }) => {
           rows: [
             group.items.map((item) => {
               const reading = item.on[0] ?? item.kun[0];
-              const audio = getKanjiAudio(item);
               return {
                 display: item.japanese,
                 pronunciation: reading,
                 studyItem: Object.assign({}, item, {
-                  audio,
                   kind: "kanji",
                   japanese: item.japanese,
                 }),
@@ -57,7 +55,6 @@ export const CheatSheetV2 = ({ kanaScript }) => {
                   display: item[kana],
                   pronunciation: item.roumaji,
                   studyItem: Object.assign({}, item, {
-                    audio: item[kana],
                     kind: "kana",
                     japanese: item[kana],
                   }),
@@ -89,9 +86,7 @@ export const CheatSheetV2 = ({ kanaScript }) => {
   return (
     <section
       className="cheatsheet"
-      aria-label={
-        kanaScript === scripts.kanji ? "Kanji reference" : "Kana chart"
-      }
+      aria-label={`${scriptLabel} ${kanaScript === scripts.kanji ? "reference" : "chart"}`}
     >
       <div className="cheatsheet-header">
         <button
@@ -104,7 +99,7 @@ export const CheatSheetV2 = ({ kanaScript }) => {
           ) : (
             <BookOpen aria-hidden="true" className="button-icon" />
           )}
-          {showCheatSheet ? "Hide" : "Show"}{" "}
+          {showCheatSheet ? "Hide" : "Show"} {scriptLabel}{" "}
           {kanaScript === scripts.kanji ? "Reference" : "Chart"}
         </button>
       </div>
@@ -161,9 +156,7 @@ export const CheatSheetV2 = ({ kanaScript }) => {
       >
         <div className="study-dialog-panel">
           <div className="study-dialog-header">
-            <h2 id="study-dialog-title">
-              {kanaScript === scripts.kanji ? "Kanji" : "Kana"} details
-            </h2>
+            <h2 id="study-dialog-title">{scriptLabel} details</h2>
             <button
               aria-label="Close"
               className="modal-close"
@@ -174,19 +167,9 @@ export const CheatSheetV2 = ({ kanaScript }) => {
             </button>
           </div>
           {selectedItem && (
-            <button
-              className="study-dialog-card"
-              onClick={() => speak(selectedItem.audio)}
-              type="button"
-            >
-              <Volume2 aria-hidden="true" className="card-audio-icon" />
-              <span className="sr-only">
-                {selectedItem.kind === "kanji"
-                  ? "Play first listed reading. "
-                  : "Play Japanese sound. "}
-              </span>
+            <div className="study-dialog-card">
               <RevealedCard fields={fields} />
-            </button>
+            </div>
           )}
         </div>
       </dialog>

@@ -2,8 +2,6 @@ export const shortcutActions = Object.freeze({
   toggleAnswer: "toggle-answer",
   previousCard: "previous-card",
   nextCard: "next-card",
-  playSound: "play-sound",
-  toggleAnnounce: "toggle-announce",
   openLegend: "open-legend",
 });
 
@@ -27,16 +25,6 @@ export const keyboardShortcutLegend = Object.freeze([
     key: "Enter",
     action: shortcutActions.nextCard,
     description: "Move to the next card.",
-  },
-  {
-    key: "P",
-    action: shortcutActions.playSound,
-    description: "Play the Japanese audio.",
-  },
-  {
-    key: "A",
-    action: shortcutActions.toggleAnnounce,
-    description: "Start or stop announce mode.",
   },
   {
     key: "?",
@@ -105,10 +93,6 @@ export const getKeyboardShortcutAction = (event) => {
       return shortcutActions.toggleAnswer;
     case "enter":
       return shortcutActions.nextCard;
-    case "p":
-      return shortcutActions.playSound;
-    case "a":
-      return shortcutActions.toggleAnnounce;
     default:
       return null;
   }

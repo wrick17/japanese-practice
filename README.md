@@ -5,7 +5,9 @@ local word practice.
 
 ## Current App State
 
-- Scripts supported now: Hiragana, Katakana, and Kanji.
+- Scripts supported now: Hiragana, Katakana, and Kanji. The script control is
+  a multi-select, and every selected script gets its own independently saved
+  row or JLPT-level selector.
 - Kanji practice contains all 2,230 characters assigned a new or legacy JLPT
   estimate in the pinned `kanji-data` source: N5 (80), N4 (166), N3 (367), N2
   (373), and N1 (1,244).
@@ -15,8 +17,7 @@ local word practice.
   Reading-to-Kanji prompts include meaning context to disambiguate shared
   readings.
 - Clicking a Kana chart or Kanji reference item opens the same revealed details
-  in a modal. Clicking the revealed card plays its Japanese audio; the modal
-  closes with its button, Escape, or a backdrop click.
+  in a modal, which closes with its button, Escape, or a backdrop click.
 - The Kanji reference presents N5 through N1 as full-width group rows; Kana
   charts retain their compact multi-column layout.
 - Five-tile Hiragana and Katakana chart rows shrink evenly within each group so
@@ -24,14 +25,16 @@ local word practice.
 - Kana row selectors use a compact six-column grid, keeping the largest groups
   within two rows at narrow widths; the All control stays text-only for clean
   alignment.
-- Kanji audio speaks the first listed on-yomi, or the first kun-yomi when an
-  entry has no on-yomi. Kanji readings depend on the word and context, so the
-  full reading list remains visible on every revealed card.
-- Study modes:
+- Kanji readings depend on the word and context, so the full reading list
+  remains visible on every revealed card.
+- Study modes combine cards from every selected script:
   - Learn, with answers always revealed and the answer control locked.
   - Kana character to romaji, or Kanji to reading, self-check.
   - Romaji to kana character, or reading to Kanji.
   - Words, with a selectable Japanese, romaji, or English prompt.
+- When multiple scripts are active, non-Japanese prompts name the expected
+  answer script or script combination, such as `Answer: Katakana` or
+  `Answer: Hiragana + Kanji`.
 - The header uses a compact `あ Learning` wordmark and dropdown controls for
   script, mode, prompt, and deck order.
 - Wider viewports use a two-column study layout; mobile keeps the compact
@@ -41,40 +44,34 @@ local word practice.
 - The practice card keeps a stable size when answers are revealed, its action
   labels stay on one line, revealed values grow to fill their available row and
   fit down to one line without clipping, Japanese stays visually largest, and
-  romaji/English use smaller caps. Announce mode does not hide a revealed
-  answer.
+  romaji/English use smaller caps.
 - Kana cards keep standard romaji beside a pronunciation cue, such as `a(aa)`,
   `shi(shee)`, and `tsu(tsoo)`; Words mode keeps dictionary romaji unchanged.
 - Prompts use the available card space and fit down; long Kanji readings and
   meanings can wrap within the card.
 - The keyboard-shortcut help button sits beside the deck count and
-  Previous/Next buttons. The navigation, reveal, and announce controls use
-  compact labels with tall mobile-friendly touch targets.
+  Previous/Next buttons. The navigation and reveal controls use compact labels
+  with tall mobile-friendly touch targets.
 - Every shortcut-enabled control includes a small, faint keycap hint for its
   corresponding key without changing the control's accessible label.
-- Lucide icons consistently identify navigation, audio, answer, announce,
-  reset, reference, dialog, guide, and external-link actions without replacing
-  their accessible text labels.
+- Lucide icons consistently identify navigation, answer, reset, reference,
+  dialog, guide, and external-link actions without replacing their accessible
+  text labels.
 - A beginner-friendly, collapsed "How to use the platform" guide keeps the
   Kana and Kanji learning paths in separate subsections.
-- A collapsed Features guide explains card audio, announce mode, row-aware word
-  practice, deck controls, study tools, shortcuts, and saved settings.
+- A collapsed Features guide explains row-aware word practice, deck controls,
+  study tools, shortcuts, and saved settings.
 - Defaults: Hiragana, vowel row, sequential order, Learn mode, and
   Romaji prompt for Words mode.
 - The shuffle toggle applies to character decks; word decks always shuffle.
-- Kanji uses Learn, Kanji to Reading, and Reading to Kanji modes. Kana Words
-  mode stays separate until a sourced Kanji vocabulary deck is added.
+- Kanji uses Learn, Kanji to Reading, and Reading to Kanji modes. Words mode
+  combines selected Hiragana and Katakana rows and ignores Kanji until a
+  sourced Kanji vocabulary deck is added; it is hidden when Kanji is the only
+  selected script.
 - Settings are stored in `localStorage` under
   `japanese-practice-settings-v1`; Reset restores defaults.
 - Keyboard shortcuts are available from the keyboard-icon popup in the header.
-- Audio normally uses the browser's installed Japanese speech voice. Safari 27
-  on iPhone uses cached audio from the `/api/tts` Pages Function because that
-  release can report successful Web Speech events while producing no sound. The
-  fallback validates short Japanese-only input, generates it with Cloudflare's
-  MeloTTS Workers AI model, pads short prompts to avoid near-silent model output,
-  serves the audio with Safari-compatible byte ranges, and plays it through the
-  native media element. This path stays limited to the affected browser so
-  existing speech behavior and cost remain unchanged elsewhere.
+- The app has no audio, text-to-speech, or automatic announce feature.
 - The app registers no service worker: website files use normal HTTP browser
   caching only. On app load, stale workers are unregistered and only the two
   retired Piper cache names are cleared.
@@ -118,8 +115,7 @@ auditable even though the upstream download URL is live.
 
 KANJIDIC2 notation is preserved: on-yomi is normally Katakana, kun-yomi is
 normally Hiragana, a dot separates a reading from its okurigana, and a leading
-or trailing hyphen marks a reading restricted to that position. Audio removes
-only the dot and hyphen notation before speaking. See
+or trailing hyphen marks a reading restricted to that position. See
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for source licensing and the
 transformations applied.
 
@@ -162,8 +158,6 @@ retain native Tab and Enter/Space behavior.
 - `Left Arrow`: move to the previous card.
 - `Right Arrow`: move to the next card.
 - `Enter`: move to the next card.
-- `P`: play the Japanese audio.
-- `A`: start or stop announce mode.
 - `Esc`: close the popup.
 
 ## Tooling
@@ -186,9 +180,6 @@ retain native Tab and Enter/Space behavior.
 - Build output directory: `dist`.
 - Automatic production branch deployments: enabled.
 - Git source: `wrick17/japanese-practice`.
-- Workers AI binding: `AI`, declared in `wrangler.jsonc` and used by the
-  Safari 27 `/api/tts` Pages Function. Generated audio responses are cached for
-  one year, and requests are limited to 32 Japanese characters.
 - Custom domain: `japanese.wrick17.com`.
 - DNS target: `japanese-practice-c5y.pages.dev` after the custom domain is added
   to the Pages project.

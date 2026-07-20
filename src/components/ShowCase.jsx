@@ -1,13 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 import classNames from "classnames";
-import {
-  CircleCheck,
-  Eye,
-  EyeOff,
-  Megaphone,
-  MegaphoneOff,
-  Volume2,
-} from "lucide-react";
+import { CircleCheck, Eye, EyeOff } from "lucide-react";
 import { fitText } from "../utils/fitText";
 import { getKanaRomajiDisplay, modes, wordPrompts } from "../utils/utilsV2";
 
@@ -17,12 +10,29 @@ const wordLabels = {
   [wordPrompts.english]: "English",
 };
 
-const getKanaPrompt = (item, mode) => {
+const japaneseScripts = [
+  ["Hiragana", /\p{Script=Hiragana}/u],
+  ["Katakana", /\p{Script=Katakana}/u],
+  ["Kanji", /\p{Script=Han}/u],
+];
+
+export const getJapaneseScriptLabel = (input) =>
+  japaneseScripts
+    .filter(([, pattern]) => pattern.test(input))
+    .map(([label]) => label)
+    .join(" + ");
+
+const getPromptLabel = (label, item, showScriptHint) =>
+  showScriptHint
+    ? `${label} · Answer: ${getJapaneseScriptLabel(item.japanese)}`
+    : label;
+
+const getKanaPrompt = (item, mode, showScriptHint) => {
   if (mode === modes.kanaToRomaji) {
     return { label: "Japanese", value: item.japanese, japanese: true };
   }
   return {
-    label: "Romaji",
+    label: getPromptLabel("Romaji", item, showScriptHint),
     value: getKanaRomajiDisplay(item.roumaji),
     japanese: false,
   };
@@ -51,10 +61,10 @@ const getKanjiReadings = (item) =>
 
 const getKanjiMeaning = (item) => item.meanings.join(", ");
 
-const getKanjiPrompt = (item, mode) => {
+const getKanjiPrompt = (item, mode, showScriptHint) => {
   if (mode === modes.romajiToKana) {
     return {
-      label: "Readings · Meaning",
+      label: getPromptLabel("Readings · Meaning", item, showScriptHint),
       value: `${getKanjiReadings(item)} · ${getKanjiMeaning(item)}`,
       japanese: false,
       multiline: true,
@@ -90,8 +100,11 @@ const getKanjiAnswers = (item, mode) => {
   ].filter(Boolean);
 };
 
-const getWordPrompt = (item, wordPrompt) => ({
-  label: wordLabels[wordPrompt],
+const getWordPrompt = (item, wordPrompt, showScriptHint) => ({
+  label:
+    wordPrompt === wordPrompts.japanese
+      ? wordLabels[wordPrompt]
+      : getPromptLabel(wordLabels[wordPrompt], item, showScriptHint),
   value: item[wordPrompt],
   japanese: wordPrompt === wordPrompts.japanese,
 });
@@ -149,15 +162,20 @@ const FittedAnswer = ({ field, fieldCount, prompt = false }) => {
   );
 };
 
-export const getStudyFields = (item, mode, wordPrompt) => {
+export const getStudyFields = (
+  item,
+  mode,
+  wordPrompt,
+  showScriptHint = false,
+) => {
   if (!item) return { prompt: null, fields: [] };
 
   const prompt =
     item.kind === "word"
-      ? getWordPrompt(item, wordPrompt)
+      ? getWordPrompt(item, wordPrompt, showScriptHint)
       : item.kind === "kanji"
-        ? getKanjiPrompt(item, mode)
-        : getKanaPrompt(item, mode);
+        ? getKanjiPrompt(item, mode, showScriptHint)
+        : getKanaPrompt(item, mode, showScriptHint);
   const answers =
     item.kind === "word"
       ? getWordAnswers(item, wordPrompt)
@@ -190,36 +208,20 @@ export const ShowCase = ({
   mode,
   wordPrompt,
   show,
-  announce,
-  onSpeak,
+  showScriptHint,
   onToggleAnswer,
-  onToggleAnnounce,
 }) => {
-  const { prompt, fields } = getStudyFields(item, mode, wordPrompt);
+  const { prompt, fields } = getStudyFields(
+    item,
+    mode,
+    wordPrompt,
+    showScriptHint,
+  );
   const AnswerIcon = answerLocked ? CircleCheck : show ? EyeOff : Eye;
-  const AnnounceIcon = announce ? MegaphoneOff : Megaphone;
 
   return (
     <div className="practice-stage">
-      <button
-        className="showcase"
-        disabled={!item}
-        onClick={onSpeak}
-        type="button"
-      >
-        {item && (
-          <>
-            <span className="sr-only">
-              {item.kind === "kanji"
-                ? "Play first listed reading. "
-                : "Play Japanese sound. "}
-            </span>
-            <span aria-hidden="true" className="card-audio-control">
-              <Volume2 className="button-icon" />
-              <kbd className="shortcut-hint">P</kbd>
-            </span>
-          </>
-        )}
+      <div className="showcase">
         {!item ? (
           <span className="block empty-state">Pick a study group to start</span>
         ) : show ? (
@@ -229,14 +231,14 @@ export const ShowCase = ({
             className={classNames("block", {
               kana: prompt.japanese,
               roumaji: !prompt.japanese,
-              english: prompt.label === "English",
+              english: prompt.label.startsWith("English"),
             })}
           >
             <FittedAnswer field={prompt} fieldCount={1} prompt />
             <span className="small-subtext">{prompt.label}</span>
           </span>
         )}
-      </button>
+      </div>
       <div className="card-actions">
         <button
           className="show help with-icon"
@@ -252,18 +254,6 @@ export const ShowCase = ({
               : "Reveal Answer"}
           <kbd aria-hidden="true" className="shortcut-hint">
             Space
-          </kbd>
-        </button>
-        <button
-          className="show speak with-icon"
-          onClick={onToggleAnnounce}
-          disabled={!item}
-          type="button"
-        >
-          <AnnounceIcon aria-hidden="true" className="button-icon" />
-          {announce ? "Stop Announce" : "Announce"}
-          <kbd aria-hidden="true" className="shortcut-hint">
-            A
           </kbd>
         </button>
       </div>

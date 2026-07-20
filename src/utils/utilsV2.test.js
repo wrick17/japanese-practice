@@ -7,16 +7,13 @@ import {
   defaultSettings,
   getDeck,
   getInitialList,
-  getKanjiAudio,
   getKanaRomajiDisplay,
-  needsNativeSpeechAudio,
   loadSettings,
   modes,
   normalizeSettings,
   saveSettings,
   scripts,
   shuffle,
-  speak,
   STORAGE_KEY,
   wordPrompts,
 } from "./utilsV2";
@@ -155,6 +152,13 @@ const createStorage = (initial = {}) => {
   };
 };
 
+const getSingleScriptDeck = ({ list, kanaScript, ...settings }) =>
+  getDeck({
+    ...settings,
+    lists: { [kanaScript]: list },
+    selectedScripts: [kanaScript],
+  });
+
 test("builds one selector row for each kana row", () => {
   const list = getInitialList();
   const expectedRows = japanese.reduce(
@@ -203,7 +207,7 @@ test("filters practice items by checked row", () => {
     }
   }
 
-  const roumaji = getDeck({
+  const roumaji = getSingleScriptDeck({
     list,
     mode: modes.romajiToKana,
     kanaScript: scripts.hiragana,
@@ -216,7 +220,7 @@ test("filters practice items by checked row", () => {
 });
 
 test("uses sequential kana order when shuffle is off", () => {
-  const deck = getDeck({
+  const deck = getSingleScriptDeck({
     list: getInitialList(["gojuuon:a"]),
     mode: modes.romajiToKana,
     kanaScript: scripts.hiragana,
@@ -227,7 +231,7 @@ test("uses sequential kana order when shuffle is off", () => {
 });
 
 test("learn mode supports multiple selected rows", () => {
-  const deck = getDeck({
+  const deck = getSingleScriptDeck({
     list: getInitialList(["gojuuon:a", "gojuuon:k"]),
     mode: modes.learn,
     kanaScript: scripts.hiragana,
@@ -250,7 +254,7 @@ test("learn mode supports multiple selected rows", () => {
 
 test("builds a complete Kanji deck from selected JLPT estimates", () => {
   const selectedKanji = ["kanji:n5", "kanji:n4"];
-  const deck = getDeck({
+  const deck = getSingleScriptDeck({
     list: getInitialList(selectedKanji, scripts.kanji),
     mode: modes.learn,
     kanaScript: scripts.kanji,
@@ -267,110 +271,7 @@ test("builds a complete Kanji deck from selected JLPT estimates", () => {
     meanings: ["one", "one radical (no.1)"],
     kind: "kanji",
     level: "N5",
-    audio: "イチ",
   });
-});
-
-test("speaks single characters immediately at a slower rate", () => {
-  const originalSpeechSynthesis = globalThis.speechSynthesis;
-  const OriginalUtterance = globalThis.SpeechSynthesisUtterance;
-  const events = [];
-
-  globalThis.speechSynthesis = {
-    getVoices: () => [{ lang: "ja-JP" }],
-    speak: (utterance) =>
-      events.push(
-        `speak:${utterance.text}:${utterance.rate}:${utterance.voice.lang}`,
-      ),
-  };
-  globalThis.SpeechSynthesisUtterance = function (text) {
-    this.text = text;
-  };
-
-  try {
-    speak("な");
-    expect(events).toEqual(["speak:な:0.1:ja-JP"]);
-  } finally {
-    if (originalSpeechSynthesis === undefined) {
-      delete globalThis.speechSynthesis;
-    } else {
-      globalThis.speechSynthesis = originalSpeechSynthesis;
-    }
-    if (OriginalUtterance === undefined) {
-      delete globalThis.SpeechSynthesisUtterance;
-    } else {
-      globalThis.SpeechSynthesisUtterance = OriginalUtterance;
-    }
-  }
-});
-
-test("uses native media audio for Safari 27 on iPhone", () => {
-  const originalAudio = globalThis.Audio;
-  const originalNavigator = globalThis.navigator;
-  const events = [];
-
-  globalThis.navigator = {
-    userAgent:
-      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/27.0 Mobile/15E148 Safari/604.1",
-  };
-  globalThis.Audio = function (source) {
-    this.source = source;
-    this.pause = () => events.push("pause");
-    this.play = () => {
-      events.push(`play:${this.source}:${this.playbackRate}`);
-      return Promise.resolve();
-    };
-  };
-
-  try {
-    expect(needsNativeSpeechAudio(globalThis.navigator.userAgent)).toBe(true);
-    speak("な");
-    expect(events).toEqual(["play:/api/tts?v=7&text=%E3%81%AA:0.75"]);
-  } finally {
-    globalThis.Audio = originalAudio;
-    globalThis.navigator = originalNavigator;
-  }
-});
-
-test("does not use the native media fallback on earlier Safari versions", () => {
-  expect(
-    needsNativeSpeechAudio(
-      "Mozilla/5.0 (iPhone) Version/26.0 Mobile/15E148 Safari/604.1",
-    ),
-  ).toBe(false);
-});
-
-test("keeps longer readings at the normal reduced speech rate", () => {
-  const originalSpeechSynthesis = globalThis.speechSynthesis;
-  const OriginalUtterance = globalThis.SpeechSynthesisUtterance;
-  const originalSetTimeout = globalThis.setTimeout;
-  let utterance;
-
-  globalThis.speechSynthesis = {
-    cancel: () => {},
-    getVoices: () => [],
-    speak: (value) => {
-      utterance = value;
-    },
-  };
-  globalThis.SpeechSynthesisUtterance = function (text) {
-    this.text = text;
-  };
-  globalThis.setTimeout = (callback) => callback();
-
-  try {
-    speak("かな");
-    expect(utterance.rate).toBe(0.25);
-  } finally {
-    globalThis.speechSynthesis = originalSpeechSynthesis;
-    globalThis.SpeechSynthesisUtterance = OriginalUtterance;
-    globalThis.setTimeout = originalSetTimeout;
-  }
-});
-
-test("uses one clean primary Kanji reading for speech", () => {
-  expect(getKanjiAudio({ on: ["-ノウ"], kun: [] })).toBe("ノウ");
-  expect(getKanjiAudio({ on: [], kun: ["こ.む"] })).toBe("こむ");
 });
 
 test("keeps kana romaji beside its pronunciation cue", () => {
@@ -411,12 +312,13 @@ test("always shuffles word decks", () => {
       mode: modes.words,
       kanaScript: scripts.hiragana,
     };
-    const forcedShuffle = getDeck({ ...args, shuffle: false }).map(
+    const forcedShuffle = getSingleScriptDeck({ ...args, shuffle: false }).map(
       (item) => item.japanese,
     );
-    const explicitShuffle = getDeck({ ...args, shuffle: true }).map(
-      (item) => item.japanese,
-    );
+    const explicitShuffle = getSingleScriptDeck({
+      ...args,
+      shuffle: true,
+    }).map((item) => item.japanese);
 
     expect(forcedShuffle.length).toBeGreaterThan(1);
     expect(forcedShuffle).toEqual(explicitShuffle);
@@ -442,7 +344,7 @@ test("uses the beginner mode order and defaults to learn", () => {
 });
 
 test("returns no cards when no rows are selected", () => {
-  const deck = getDeck({
+  const deck = getSingleScriptDeck({
     list: getInitialList([]),
     mode: modes.romajiToKana,
     kanaScript: scripts.hiragana,
@@ -456,18 +358,24 @@ test("loads, saves, and clears local settings", () => {
   const storage = createStorage();
   const settings = {
     mode: modes.learn,
-    kanaScript: scripts.katakana,
+    selectedScripts: [scripts.hiragana, scripts.katakana],
     shuffle: true,
-    selectedRows: ["gojuuon:a", "missing"],
+    selectedRows: {
+      ...defaultSettings.selectedRows,
+      [scripts.katakana]: ["gojuuon:a", "missing"],
+    },
   };
 
   saveSettings(settings, storage);
   expect(loadSettings(storage)).toEqual({
     ...defaultSettings,
     mode: modes.learn,
-    kanaScript: scripts.katakana,
+    selectedScripts: [scripts.hiragana, scripts.katakana],
     shuffle: true,
-    selectedRows: ["gojuuon:a"],
+    selectedRows: {
+      ...defaultSettings.selectedRows,
+      [scripts.katakana]: ["gojuuon:a"],
+    },
   });
 
   clearSettings(storage);
@@ -481,17 +389,53 @@ test("migrates saved kana settings and rejects Words mode for Kanji", () => {
     selectedRows: ["gojuuon:a"],
   });
   const savedKanji = normalizeSettings({
-    ...savedKana,
     mode: modes.words,
     kanaScript: scripts.kanji,
+    selectedKanji: ["kanji:n5"],
   });
 
-  expect(savedKana.selectedKanji).toEqual(defaultSettings.selectedKanji);
+  expect(savedKana.selectedScripts).toEqual([scripts.hiragana]);
+  expect(savedKana.selectedRows).toEqual(defaultSettings.selectedRows);
+  expect(savedKanji.selectedScripts).toEqual([scripts.kanji]);
   expect(savedKanji.mode).toBe(modes.learn);
   expect(
-    normalizeSettings({ selectedKanji: ["kanji:numbers:一"] }).selectedKanji,
-  ).toEqual(defaultSettings.selectedKanji);
-  expect(normalizeSettings({ selectedKanji: [] }).selectedKanji).toEqual([]);
+    normalizeSettings({
+      kanaScript: scripts.kanji,
+      selectedKanji: ["kanji:numbers:一"],
+    }).selectedRows.kanji,
+  ).toEqual(defaultSettings.selectedRows.kanji);
+  expect(
+    normalizeSettings({ kanaScript: scripts.kanji, selectedKanji: [] })
+      .selectedRows.kanji,
+  ).toEqual([]);
+});
+
+test("combines independently selected rows across scripts", () => {
+  const deck = getDeck({
+    lists: {
+      [scripts.hiragana]: getInitialList(["gojuuon:a"]),
+      [scripts.katakana]: getInitialList(["gojuuon:k"], scripts.katakana),
+      [scripts.kanji]: getInitialList(["kanji:n5"], scripts.kanji),
+    },
+    mode: modes.learn,
+    selectedScripts: Object.values(scripts),
+    shuffle: false,
+  });
+
+  expect(deck.slice(0, 10).map((item) => item.japanese)).toEqual([
+    "あ",
+    "い",
+    "う",
+    "え",
+    "お",
+    "カ",
+    "キ",
+    "ク",
+    "ケ",
+    "コ",
+  ]);
+  expect(deck).toHaveLength(5 + 5 + 80);
+  expect(deck.at(-1).kind).toBe("kanji");
 });
 
 test("JLPT-estimate Kanji data has unique, complete N5-N1 cards", () => {
@@ -523,9 +467,6 @@ test("JLPT-estimate Kanji data has unique, complete N5-N1 cards", () => {
     expect(item.japanese).toMatch(/^\p{Script=Han}$/u);
     expect(item.on.length + item.kun.length).toBeGreaterThan(0);
     expect(item.meanings.length).toBeGreaterThan(0);
-    expect(getKanjiAudio(item)).toMatch(
-      /^[\p{Script=Hiragana}\p{Script=Katakana}ー]+$/u,
-    );
     expect(new Set(item.on).size).toBe(item.on.length);
     expect(new Set(item.kun).size).toBe(item.kun.length);
     expect(new Set(item.meanings).size).toBe(item.meanings.length);
@@ -573,7 +514,7 @@ test("falls back to defaults for corrupt settings", () => {
 });
 
 test("filters hiragana words strictly by selected rows", () => {
-  const deck = getDeck({
+  const deck = getSingleScriptDeck({
     list: getInitialList(["gojuuon:a"]),
     mode: modes.words,
     kanaScript: scripts.hiragana,
@@ -595,7 +536,7 @@ test("katakana word mode uses real katakana words", () => {
     }
   }
 
-  const deck = getDeck({
+  const deck = getSingleScriptDeck({
     list,
     mode: modes.words,
     kanaScript: scripts.katakana,
@@ -607,6 +548,32 @@ test("katakana word mode uses real katakana words", () => {
     expect(word.script).toBe(scripts.katakana);
     expect(/^[\u30A1-\u30FA\u30FD-\u30FF]+$/.test(word.japanese)).toBe(true);
   }
+});
+
+test("word mode combines selected kana scripts and skips Kanji", () => {
+  const lists = Object.fromEntries(
+    Object.values(scripts).map((script) => [
+      script,
+      getInitialList(undefined, script),
+    ]),
+  );
+  for (const script of [scripts.hiragana, scripts.katakana]) {
+    for (const group of lists[script]) {
+      for (const row of group.rows) row.checked = true;
+    }
+  }
+
+  const deck = getDeck({
+    lists,
+    mode: modes.words,
+    selectedScripts: Object.values(scripts),
+    shuffle: false,
+  });
+
+  expect(new Set(deck.map((word) => word.script))).toEqual(
+    new Set([scripts.hiragana, scripts.katakana]),
+  );
+  expect(deck.every((word) => word.kind === "word")).toBe(true);
 });
 
 test("core kana table uses accurate katakana and romaji", () => {

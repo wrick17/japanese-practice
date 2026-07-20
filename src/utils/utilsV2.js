@@ -2,26 +2,6 @@ import wordsData from "../constants/wordsV2.json";
 import { japanese } from "../constants/constantsV2";
 import { kanji } from "../constants/kanjiV1";
 
-const lang = "ja-JP";
-
-let speechAudio;
-
-export const needsNativeSpeechAudio = (userAgent = "") =>
-  /iP(?:hone|ad|od)/.test(userAgent) &&
-  /Version\/27(?:\.|\s)/.test(userAgent) &&
-  /Safari\//.test(userAgent);
-
-const speakWithNativeAudio = (input) => {
-  const Audio = globalThis.Audio;
-  if (typeof Audio !== "function") return false;
-
-  speechAudio?.pause();
-  speechAudio = new Audio(`/api/tts?v=7&text=${encodeURIComponent(input)}`);
-  speechAudio.playbackRate = [...input].length === 1 ? 0.75 : 0.9;
-  speechAudio.play().catch(() => {});
-  return true;
-};
-
 const kanaVowelSounds = {
   a: "aa",
   i: "ee",
@@ -53,11 +33,14 @@ export const wordPrompts = {
 
 export const defaultSettings = {
   mode: modes.learn,
-  kanaScript: scripts.hiragana,
+  selectedScripts: [scripts.hiragana],
   shuffle: false,
   wordPrompt: wordPrompts.romaji,
-  selectedRows: ["gojuuon:a"],
-  selectedKanji: ["kanji:n5"],
+  selectedRows: {
+    [scripts.hiragana]: ["gojuuon:a"],
+    [scripts.katakana]: ["gojuuon:a"],
+    [scripts.kanji]: ["kanji:n5"],
+  },
 };
 
 const getKanaSound = (romaji) => {
@@ -77,32 +60,6 @@ const kanaMap = {
   [scripts.hiragana]: "kana",
   [scripts.katakana]: "kanaK",
 };
-
-export const speak = (input) => {
-  if (!input) return;
-  if (
-    needsNativeSpeechAudio(globalThis.navigator?.userAgent) &&
-    speakWithNativeAudio(input)
-  ) {
-    return;
-  }
-
-  const synth = globalThis.speechSynthesis;
-  const Utterance = globalThis.SpeechSynthesisUtterance;
-  if (!synth || typeof Utterance !== "function") return;
-
-  const utterance = new Utterance(input);
-  utterance.voice = synth
-    .getVoices()
-    .find((voice) => voice.lang.toLowerCase().startsWith("ja"));
-  utterance.lang = lang;
-  utterance.rate = [...input].length === 1 ? 0.1 : 0.25;
-  utterance.volume = 1;
-  synth.speak(utterance);
-};
-
-export const getKanjiAudio = (item) =>
-  (item.on[0] ?? item.kun[0]).replace(/[.-]/g, "");
 
 export const shuffle = (array) => {
   const copy = [...array];
@@ -158,31 +115,60 @@ export const getKanaKey = (kanaScript) =>
   kanaMap[kanaScript] ?? kanaMap.hiragana;
 
 export const normalizeSettings = (settings = {}) => {
-  const hasSelectedRows = Array.isArray(settings.selectedRows);
-  const selectedRows = hasSelectedRows
-    ? settings.selectedRows.filter((row) => rowIds.has(row))
-    : defaultSettings.selectedRows;
-  const hasSelectedKanji = Array.isArray(settings.selectedKanji);
-  const selectedKanji = hasSelectedKanji
-    ? settings.selectedKanji.filter((item) => kanjiIds.has(item))
-    : defaultSettings.selectedKanji;
-  const migratedKanji =
-    hasSelectedKanji &&
-    !selectedKanji.length &&
-    settings.selectedKanji.some((item) => item.startsWith("kanji:"))
-      ? defaultSettings.selectedKanji
-      : selectedKanji;
-  const kanaScript = scriptValues.has(settings.kanaScript)
+  const legacyScript = scriptValues.has(settings.kanaScript)
     ? settings.kanaScript
-    : defaultSettings.kanaScript;
+    : scripts.hiragana;
+  const selectedScripts = Array.isArray(settings.selectedScripts)
+    ? [
+        ...new Set(
+          settings.selectedScripts.filter((script) => scriptValues.has(script)),
+        ),
+      ]
+    : [legacyScript];
+  const safeScripts = selectedScripts.length
+    ? selectedScripts
+    : defaultSettings.selectedScripts;
+  const legacyRows = Array.isArray(settings.selectedRows)
+    ? settings.selectedRows
+    : null;
+  const legacyKanji = Array.isArray(settings.selectedKanji)
+    ? settings.selectedKanji
+    : null;
+  const selectedRows = Object.fromEntries(
+    Object.values(scripts).map((script) => {
+      const ids = script === scripts.kanji ? kanjiIds : rowIds;
+      const saved = Array.isArray(settings.selectedRows?.[script])
+        ? settings.selectedRows[script]
+        : script === legacyScript
+          ? script === scripts.kanji
+            ? legacyKanji
+            : legacyRows
+          : null;
+      const filtered = saved?.filter((row) => ids.has(row));
+      return [
+        script,
+        saved
+          ? script === scripts.kanji &&
+            saved === legacyKanji &&
+            !filtered.length &&
+            saved.some((row) => row.startsWith("kanji:"))
+            ? defaultSettings.selectedRows[script]
+            : filtered
+          : defaultSettings.selectedRows[script],
+      ];
+    }),
+  );
   const mode = modeValues.has(settings.mode)
     ? settings.mode
     : defaultSettings.mode;
 
   return {
     mode:
-      kanaScript === scripts.kanji && mode === modes.words ? modes.learn : mode,
-    kanaScript,
+      safeScripts.every((script) => script === scripts.kanji) &&
+      mode === modes.words
+        ? modes.learn
+        : mode,
+    selectedScripts: safeScripts,
     shuffle:
       typeof settings.shuffle === "boolean"
         ? settings.shuffle
@@ -191,7 +177,6 @@ export const normalizeSettings = (settings = {}) => {
       ? settings.wordPrompt
       : defaultSettings.wordPrompt,
     selectedRows,
-    selectedKanji: migratedKanji,
   };
 };
 
@@ -222,10 +207,7 @@ export const clearSettings = (storage = globalThis.localStorage) => {
 
 export const getInitialList = (selectedRows, kanaScript = scripts.hiragana) => {
   const selected = new Set(
-    selectedRows ??
-      (kanaScript === scripts.kanji
-        ? defaultSettings.selectedKanji
-        : defaultSettings.selectedRows),
+    selectedRows ?? defaultSettings.selectedRows[kanaScript],
   );
 
   if (kanaScript === scripts.kanji) {
@@ -313,7 +295,6 @@ const getKanjiItems = (list) => {
           Object.assign({}, item, {
             kind: "kanji",
             level: group.label,
-            audio: getKanjiAudio(item),
           }),
         )
       : [],
@@ -339,15 +320,21 @@ const getWordItems = (list, kanaScript) => {
     );
 };
 
-export const getDeck = ({ list, mode, kanaScript, shuffle: shouldShuffle }) => {
-  const items =
-    kanaScript === scripts.kanji
-      ? getKanjiItems(list)
-      : mode === modes.words
-        ? getWordItems(list, kanaScript)
-        : getKanaItems(list, kanaScript);
+export const getDeck = ({
+  lists,
+  mode,
+  selectedScripts,
+  shuffle: shouldShuffle,
+}) => {
+  const items = selectedScripts.flatMap((script) => {
+    const list = lists[script];
+    if (script === scripts.kanji) {
+      return mode === modes.words ? [] : getKanjiItems(list);
+    }
+    return mode === modes.words
+      ? getWordItems(list, script)
+      : getKanaItems(list, script);
+  });
 
-  return (mode === modes.words && kanaScript !== scripts.kanji) || shouldShuffle
-    ? shuffle(items)
-    : items;
+  return mode === modes.words || shouldShuffle ? shuffle(items) : items;
 };

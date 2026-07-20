@@ -13,50 +13,40 @@ import {
 
 export const useJapanese = () => {
   const [settings, setSettings] = useState(loadSettings);
-  const [list, setListState] = useState(() =>
-    getInitialList(
-      settings.kanaScript === scripts.kanji
-        ? settings.selectedKanji
-        : settings.selectedRows,
-      settings.kanaScript,
+  const [lists, setLists] = useState(() =>
+    Object.fromEntries(
+      Object.values(scripts).map((script) => [
+        script,
+        getInitialList(settings.selectedRows[script], script),
+      ]),
     ),
   );
   const [currentItem, setCurrentItem] = useState(0);
   const [cycle, setCycle] = useState(0);
 
-  const setList = (nextList) => {
-    setListState(nextList);
+  const setList = (script, nextList) => {
+    setLists((current) => ({ ...current, [script]: nextList }));
     setCurrentItem(0);
   };
 
   const deck = useMemo(
-    () => getDeck({ ...settings, list, cycle }),
-    [cycle, list, settings],
+    () => getDeck({ ...settings, lists, cycle }),
+    [cycle, lists, settings],
   );
 
   const updateSettings = (nextSettings) => {
-    const selectionKey =
-      settings.kanaScript === scripts.kanji ? "selectedKanji" : "selectedRows";
     const next = normalizeSettings({
       ...settings,
       ...nextSettings,
-      [selectionKey]: getSelectedRows(list),
+      selectedRows: Object.fromEntries(
+        Object.entries(lists).map(([script, list]) => [
+          script,
+          getSelectedRows(list),
+        ]),
+      ),
     });
 
     setSettings(next);
-    if (
-      nextSettings.kanaScript &&
-      nextSettings.kanaScript !== settings.kanaScript
-    ) {
-      setList(
-        getInitialList(
-          next.kanaScript === scripts.kanji
-            ? next.selectedKanji
-            : next.selectedRows,
-          next.kanaScript,
-        ),
-      );
-    }
     setCurrentItem(0);
   };
 
@@ -78,8 +68,13 @@ export const useJapanese = () => {
   const reset = () => {
     clearSettings();
     setSettings(defaultSettings);
-    setList(
-      getInitialList(defaultSettings.selectedRows, defaultSettings.kanaScript),
+    setLists(
+      Object.fromEntries(
+        Object.values(scripts).map((script) => [
+          script,
+          getInitialList(defaultSettings.selectedRows[script], script),
+        ]),
+      ),
     );
     setCurrentItem(0);
     setCycle((value) => value + 1);
@@ -90,16 +85,19 @@ export const useJapanese = () => {
   }, [currentItem, deck.length]);
 
   useEffect(() => {
-    const selectionKey =
-      settings.kanaScript === scripts.kanji ? "selectedKanji" : "selectedRows";
     saveSettings({
       ...settings,
-      [selectionKey]: getSelectedRows(list),
+      selectedRows: Object.fromEntries(
+        Object.entries(lists).map(([script, list]) => [
+          script,
+          getSelectedRows(list),
+        ]),
+      ),
     });
-  }, [list, settings]);
+  }, [lists, settings]);
 
   return {
-    list,
+    lists,
     setList,
     deck,
     next,
