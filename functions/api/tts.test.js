@@ -36,7 +36,7 @@ test("returns generated audio with long-lived cache headers", async () => {
   expect(calls).toEqual([
     [
       "@cf/myshell-ai/melotts",
-      { prompt: "かな", lang: "ja" },
+      { prompt: "かな", lang: "JP" },
       { returnRawResponse: true },
     ],
   ]);

@@ -71,9 +71,9 @@ local word practice.
   on iPhone uses cached audio from the `/api/tts` Pages Function because that
   release can report successful Web Speech events while producing no sound. The
   fallback validates short Japanese-only input, generates it with Cloudflare's
-  MeloTTS Workers AI model, serves its MP3 output with Safari-compatible byte
-  ranges, and plays it through the native media element. This path stays limited
-  to the affected browser so existing speech behavior and cost remain unchanged
+  MeloTTS Workers AI model, serves its audio with Safari-compatible byte ranges,
+  and plays it through the native media element. This path stays limited to the
+  affected browser so existing speech behavior and cost remain unchanged
   elsewhere.
 - The app registers no service worker: website files use normal HTTP browser
   caching only. On app load, stale workers are unregistered and only the two

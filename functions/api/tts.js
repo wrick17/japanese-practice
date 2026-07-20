@@ -49,7 +49,7 @@ export const onRequestGet = async ({ request, env, waitUntil }) => {
   if (!response) {
     const result = await env.AI.run(
       model,
-      { prompt: text, lang: "ja" },
+      { prompt: text, lang: "JP" },
       { returnRawResponse: true },
     );
     if (!result.ok) return errorResponse("Speech generation failed", 502);
