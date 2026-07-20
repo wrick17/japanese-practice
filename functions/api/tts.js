@@ -84,6 +84,7 @@ export const onRequestGet = async ({ request, env, waitUntil }) => {
 
   const [start, end] = range;
   const headers = new Headers(response.headers);
+  headers.set("Accept-Ranges", "bytes");
   headers.set("Content-Length", String(end - start + 1));
   headers.set("Content-Range", `bytes ${start}-${end}/${audio.byteLength}`);
   return new Response(audio.slice(start, end + 1), {
