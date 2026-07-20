@@ -35,8 +35,26 @@ test("returns generated audio with long-lived cache headers", async () => {
     ["@cf/myshell-ai/melotts", { prompt: "かな", lang: "ja" }],
   ]);
   expect(response.headers.get("Content-Type")).toBe("audio/wav");
+  expect(response.headers.get("Accept-Ranges")).toBe("bytes");
   expect(response.headers.get("Cache-Control")).toContain("immutable");
   expect(await response.text()).toBe("RIFFwave");
+});
+
+test("serves valid media byte ranges", async () => {
+  const response = await onRequestGet({
+    request: new Request("https://example.com/api/tts?text=かな", {
+      headers: { Range: "bytes=0-3" },
+    }),
+    env: {
+      AI: { run: async () => ({ audio: btoa("RIFFwave") }) },
+    },
+    waitUntil: () => {},
+  });
+
+  expect(response.status).toBe(206);
+  expect(response.headers.get("Content-Range")).toBe("bytes 0-3/8");
+  expect(response.headers.get("Content-Length")).toBe("4");
+  expect(await response.text()).toBe("RIFF");
 });
 
 test("rejects invalid input before calling Workers AI", async () => {

@@ -16,7 +16,7 @@ const speakWithNativeAudio = (input) => {
   if (typeof Audio !== "function") return false;
 
   speechAudio?.pause();
-  speechAudio = new Audio(`/api/tts?v=2&text=${encodeURIComponent(input)}`);
+  speechAudio = new Audio(`/api/tts?v=3&text=${encodeURIComponent(input)}`);
   speechAudio.playbackRate = [...input].length === 1 ? 0.75 : 0.9;
   speechAudio.play().catch(() => {});
   return true;

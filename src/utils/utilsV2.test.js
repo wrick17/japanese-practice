@@ -325,7 +325,7 @@ test("uses native media audio for Safari 27 on iPhone", () => {
   try {
     expect(needsNativeSpeechAudio(globalThis.navigator.userAgent)).toBe(true);
     speak("な");
-    expect(events).toEqual(["play:/api/tts?v=2&text=%E3%81%AA:0.75"]);
+    expect(events).toEqual(["play:/api/tts?v=3&text=%E3%81%AA:0.75"]);
   } finally {
     globalThis.Audio = originalAudio;
     globalThis.navigator = originalNavigator;
