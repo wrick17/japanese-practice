@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 
-import { getTtsText, onRequestGet } from "./tts";
+import { getTtsPrompt, getTtsText, onRequestGet } from "./tts";
 
 test("accepts short Japanese study text only", () => {
   expect(
@@ -16,6 +16,11 @@ test("accepts short Japanese study text only", () => {
   ).toBe(undefined);
 });
 
+test("pads only prompts that MeloTTS would render silently", () => {
+  expect(getTtsPrompt("かな")).toBe("かな。かな。かな。");
+  expect(getTtsPrompt("日本語を勉強します。")).toBe("日本語を勉強します。");
+});
+
 test("returns generated audio with long-lived cache headers", async () => {
   const calls = [];
   const response = await onRequestGet({
@@ -24,9 +29,7 @@ test("returns generated audio with long-lived cache headers", async () => {
       AI: {
         run: async (...arguments_) => {
           calls.push(arguments_);
-          return new Response("ID3audio", {
-            headers: { "Content-Type": "audio/mpeg" },
-          });
+          return { audio: btoa("RIFFwave") };
         },
       },
     },
@@ -34,16 +37,12 @@ test("returns generated audio with long-lived cache headers", async () => {
   });
 
   expect(calls).toEqual([
-    [
-      "@cf/myshell-ai/melotts",
-      { prompt: "かな", lang: "JP" },
-      { returnRawResponse: true },
-    ],
+    ["@cf/myshell-ai/melotts", { prompt: "かな。かな。かな。", lang: "JP" }],
   ]);
-  expect(response.headers.get("Content-Type")).toBe("audio/mpeg");
+  expect(response.headers.get("Content-Type")).toBe("audio/wav");
   expect(response.headers.get("Accept-Ranges")).toBe("bytes");
   expect(response.headers.get("Cache-Control")).toContain("immutable");
-  expect(await response.text()).toBe("ID3audio");
+  expect(await response.text()).toBe("RIFFwave");
 });
 
 test("serves valid media byte ranges", async () => {
@@ -52,7 +51,7 @@ test("serves valid media byte ranges", async () => {
       headers: { Range: "bytes=0-3" },
     }),
     env: {
-      AI: { run: async () => new Response("ID3audio") },
+      AI: { run: async () => ({ audio: btoa("RIFFwave") }) },
     },
     waitUntil: () => {},
   });
@@ -60,7 +59,7 @@ test("serves valid media byte ranges", async () => {
   expect(response.status).toBe(206);
   expect(response.headers.get("Content-Range")).toBe("bytes 0-3/8");
   expect(response.headers.get("Content-Length")).toBe("4");
-  expect(await response.text()).toBe("ID3a");
+  expect(await response.text()).toBe("RIFF");
 });
 
 test("rejects invalid input before calling Workers AI", async () => {

@@ -1,4 +1,5 @@
 const model = "@cf/myshell-ai/melotts";
+const minimumPromptLength = 10;
 const japaneseText =
   /^[\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Han}ー々〆〇ヶ\s・、。！？〜～]+$/u;
 
@@ -16,6 +17,13 @@ export const getTtsText = (request) => {
   if (!text || [...text].length > 32 || !japaneseText.test(text)) return;
   return text;
 };
+
+// ponytail: MeloTTS returns near-silent audio for shorter prompts; remove when fixed upstream.
+export const getTtsPrompt = (text) =>
+  [...text].length < minimumPromptLength ? `${text}。`.repeat(3) : text;
+
+const decodeBase64 = (value) =>
+  Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
 
 const getByteRange = (header, length) => {
   const match = /^bytes=(\d*)-(\d*)$/.exec(header ?? "");
@@ -47,20 +55,23 @@ export const onRequestGet = async ({ request, env, waitUntil }) => {
   let response = await cache?.match(cacheKey);
 
   if (!response) {
-    const result = await env.AI.run(
-      model,
-      { prompt: text, lang: "JP" },
-      { returnRawResponse: true },
-    );
-    if (!result.ok) return errorResponse("Speech generation failed", 502);
+    const result = await env.AI.run(model, {
+      prompt: getTtsPrompt(text),
+      lang: "JP",
+    });
+    if (!result?.audio) return errorResponse("Speech generation failed", 502);
 
-    const audio = new Uint8Array(await result.arrayBuffer());
+    const audio = decodeBase64(result.audio);
+    const contentType =
+      new TextDecoder().decode(audio.subarray(0, 4)) === "RIFF"
+        ? "audio/wav"
+        : "audio/mpeg";
     response = new Response(audio, {
       headers: {
         "Accept-Ranges": "bytes",
         "Cache-Control": "public, max-age=31536000, immutable",
         "Content-Length": String(audio.byteLength),
-        "Content-Type": result.headers.get("Content-Type") ?? "audio/mpeg",
+        "Content-Type": contentType,
         "X-Content-Type-Options": "nosniff",
       },
     });
