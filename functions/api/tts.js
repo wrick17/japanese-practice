@@ -17,9 +17,6 @@ export const getTtsText = (request) => {
   return text;
 };
 
-const decodeBase64 = (value) =>
-  Uint8Array.from(atob(value), (character) => character.charCodeAt(0));
-
 const getByteRange = (header, length) => {
   const match = /^bytes=(\d*)-(\d*)$/.exec(header ?? "");
   if (!match || (!match[1] && !match[2])) return;
@@ -50,20 +47,20 @@ export const onRequestGet = async ({ request, env, waitUntil }) => {
   let response = await cache?.match(cacheKey);
 
   if (!response) {
-    const result = await env.AI.run(model, { prompt: text, lang: "ja" });
-    if (!result?.audio) return errorResponse("Speech generation failed", 502);
+    const result = await env.AI.run(
+      model,
+      { prompt: text, lang: "ja" },
+      { returnRawResponse: true },
+    );
+    if (!result.ok) return errorResponse("Speech generation failed", 502);
 
-    const audio = decodeBase64(result.audio);
-    const contentType =
-      new TextDecoder().decode(audio.subarray(0, 4)) === "RIFF"
-        ? "audio/wav"
-        : "audio/mpeg";
+    const audio = new Uint8Array(await result.arrayBuffer());
     response = new Response(audio, {
       headers: {
         "Accept-Ranges": "bytes",
         "Cache-Control": "public, max-age=31536000, immutable",
         "Content-Length": String(audio.byteLength),
-        "Content-Type": contentType,
+        "Content-Type": result.headers.get("Content-Type") ?? "audio/mpeg",
         "X-Content-Type-Options": "nosniff",
       },
     });

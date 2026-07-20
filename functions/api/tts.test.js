@@ -24,7 +24,9 @@ test("returns generated audio with long-lived cache headers", async () => {
       AI: {
         run: async (...arguments_) => {
           calls.push(arguments_);
-          return { audio: btoa("RIFFwave") };
+          return new Response("ID3audio", {
+            headers: { "Content-Type": "audio/mpeg" },
+          });
         },
       },
     },
@@ -32,12 +34,16 @@ test("returns generated audio with long-lived cache headers", async () => {
   });
 
   expect(calls).toEqual([
-    ["@cf/myshell-ai/melotts", { prompt: "かな", lang: "ja" }],
+    [
+      "@cf/myshell-ai/melotts",
+      { prompt: "かな", lang: "ja" },
+      { returnRawResponse: true },
+    ],
   ]);
-  expect(response.headers.get("Content-Type")).toBe("audio/wav");
+  expect(response.headers.get("Content-Type")).toBe("audio/mpeg");
   expect(response.headers.get("Accept-Ranges")).toBe("bytes");
   expect(response.headers.get("Cache-Control")).toContain("immutable");
-  expect(await response.text()).toBe("RIFFwave");
+  expect(await response.text()).toBe("ID3audio");
 });
 
 test("serves valid media byte ranges", async () => {
@@ -46,7 +52,7 @@ test("serves valid media byte ranges", async () => {
       headers: { Range: "bytes=0-3" },
     }),
     env: {
-      AI: { run: async () => ({ audio: btoa("RIFFwave") }) },
+      AI: { run: async () => new Response("ID3audio") },
     },
     waitUntil: () => {},
   });
@@ -54,7 +60,7 @@ test("serves valid media byte ranges", async () => {
   expect(response.status).toBe(206);
   expect(response.headers.get("Content-Range")).toBe("bytes 0-3/8");
   expect(response.headers.get("Content-Length")).toBe("4");
-  expect(await response.text()).toBe("RIFF");
+  expect(await response.text()).toBe("ID3a");
 });
 
 test("rejects invalid input before calling Workers AI", async () => {
